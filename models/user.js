@@ -49,7 +49,7 @@ const oUserSchema = new oMongoose.Schema({
         trim: true,
         maxlength: 50
     },
-    tin_number: {
+    tin: {
         type: String,
         trim: true,
         maxlength: 50
@@ -76,6 +76,14 @@ const oUserSchema = new oMongoose.Schema({
     salt: String,
     role: {
         type: Number,
+        required: true
+    },
+    verified_email: {
+        type: Boolean, 
+        default: false
+    },
+    verified_admin: {
+        type: Boolean,
         required: true
     }
 }, { timestamps: true });
