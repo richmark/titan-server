@@ -11,7 +11,7 @@ const oUuidv1 = require('uuid/v1');
 
 const oStorage = oMulter.diskStorage({
     destination: (oRequest, oFile, oCallback) => {
-        oCallback(null, 'public/img/users');
+        oCallback(null, 'public/images/users');
     },
     filename: (oRequest, oFile, oCallback) => {
         const sExtension = oFile.mimetype.split('/')[1];
@@ -32,8 +32,7 @@ const oUpload = oMulter({
     fileFilter: oFilter
 });
 
-exports.uploadImage = (oRequest, oResponse, oNext) => {
-    oUpload.single('store_front');
-    oUpload.single('company_bir');
-    oUpload.single('store_front');
-}
+exports.uploadImage = oUpload.fields([
+    {name: 'photo'},
+    {name: 'golf_image'}
+]);

@@ -12,6 +12,7 @@ const oJwt = require('jsonwebtoken');
 const oExpressJwt = require('express-jwt');
 const oCrypto = require('crypto');
 const oNodeMailer = require('nodemailer');
+const oFormidable = require('formidable');
 
 /**
  * Set Token Email
@@ -67,8 +68,9 @@ this.setTokenEmail = (oUserData, oRequest, oResponse) => {
  * Register User and Send Validation Email
  */
 exports.registerUser = (oRequest, oResponse) => {
-    console.log(oRequest.body);
-    console.log(oRequest.file);
+    console.log(oRequest.file)
+
+    
     oResponse.json({
         reply: 'check console'
     });

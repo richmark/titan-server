@@ -11,7 +11,8 @@ const oExpress = require('express');
 const oRouter = oExpress.Router();
 
 const { registerUser } = require('../controllers/auth');
+const { uploadImage } = require('../middlewares/handleUserImage');
 
-oRouter.post('/register',  registerUser);
+oRouter.post('/register', uploadImage, registerUser);
 
 module.exports = oRouter;
