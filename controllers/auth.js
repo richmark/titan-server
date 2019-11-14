@@ -67,15 +67,19 @@ this.setTokenEmail = (oUserData, oRequest, oResponse) => {
  * Register User and Send Validation Email
  */
 exports.registerUser = (oRequest, oResponse) => {
-    
-    const oUser = new oUserModel(oRequest.body);
-    oUser.save((oError, oUserData) => {
-        if (oError) {
-            return oResponse.status(400).json({
-                error : oError 
-            });
-        }
-        return this.setTokenEmail(oUserData, oRequest, oResponse);
+    console.log(oRequest.body);
+    console.log(oRequest.file);
+    oResponse.json({
+        reply: 'check console'
     });
+    // const oUser = new oUserModel(oRequest.body);
+    // oUser.save((oError, oUserData) => {
+    //     if (oError) {
+    //         return oResponse.status(400).json({
+    //             error : oError 
+    //         });
+    //     }
+    //     return this.setTokenEmail(oUserData, oRequest, oResponse);
+    // });
 };
 
