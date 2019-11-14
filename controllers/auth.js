@@ -69,8 +69,7 @@ this.setTokenEmail = (oUserData, oRequest, oResponse) => {
  */
 exports.registerUser = (oRequest, oResponse) => {
     console.log(oRequest.file)
-
-    
+    console.log(oRequest.body);
     oResponse.json({
         reply: 'check console'
     });

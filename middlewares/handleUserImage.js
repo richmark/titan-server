@@ -15,11 +15,17 @@ const oStorage = oMulter.diskStorage({
     },
     filename: (oRequest, oFile, oCallback) => {
         const sExtension = oFile.mimetype.split('/')[1];
-        oCallback(null, `user-${oUuidv1()}.${sExtension}`)
+        const sId = `user-${oUuidv1()}.${sExtension}`;
+        oRequest.body[oFile.fieldname] = sId;
+        oCallback(null, sId);
     }
 });
 
 const oFilter = (oRequest, oFile, oCallback) => {
+    if (!oRequest.file) {
+        oRequest.file = [];
+    }
+    oRequest.file.push(oFile);
     if (oFile.mimetype.startsWith('image')) {
         oCallback(null, true);
     } else {
@@ -33,6 +39,12 @@ const oUpload = oMulter({
 });
 
 exports.uploadImage = oUpload.fields([
-    {name: 'photo'},
-    {name: 'golf_image'}
+    {name: 'company_bir'},
+    {name: 'mayor_permit'},
+    {name: 'store_front'}
 ]);
+
+exports.createFileArray = (oRequest, oResponse, oNext) => {
+    oRequest.file = [];
+    oNext();
+};
