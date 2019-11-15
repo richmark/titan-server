@@ -63,24 +63,29 @@ this.setTokenEmail = (oUserData, oRequest, oResponse) => {
     });
 };
 
+/**
+ * Request Body Image
+ */
+this.setRequestBodyImage = (oRequest) => {
+    Object.keys(oRequest.files).forEach((sKey) => {
+        oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+    });
+    return oRequest;
+};
 
 /**
  * Register User and Send Validation Email
  */
 exports.registerUser = (oRequest, oResponse) => {
-    console.log(oRequest.file)
-    console.log(oRequest.body);
-    oResponse.json({
-        reply: 'check console'
+    oRequest = this.setRequestBodyImage(oRequest);
+    const oUser = new oUserModel(oRequest.body);
+    oUser.save((oError, oUserData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error : oError 
+            });
+        }
+        return this.setTokenEmail(oUserData, oRequest, oResponse);
     });
-    // const oUser = new oUserModel(oRequest.body);
-    // oUser.save((oError, oUserData) => {
-    //     if (oError) {
-    //         return oResponse.status(400).json({
-    //             error : oError 
-    //         });
-    //     }
-    //     return this.setTokenEmail(oUserData, oRequest, oResponse);
-    // });
 };
 

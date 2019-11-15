@@ -16,16 +16,11 @@ const oStorage = oMulter.diskStorage({
     filename: (oRequest, oFile, oCallback) => {
         const sExtension = oFile.mimetype.split('/')[1];
         const sId = `user-${oUuidv1()}.${sExtension}`;
-        oRequest.body[oFile.fieldname] = sId;
         oCallback(null, sId);
     }
 });
 
 const oFilter = (oRequest, oFile, oCallback) => {
-    if (!oRequest.file) {
-        oRequest.file = [];
-    }
-    oRequest.file.push(oFile);
     if (oFile.mimetype.startsWith('image')) {
         oCallback(null, true);
     } else {
