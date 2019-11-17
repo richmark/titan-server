@@ -140,7 +140,7 @@ oUserSchema.methods = {
 };
 
 oUserSchema.pre('save', function(oCallBack) {
-	if (!this.isModified || this.isNew) return oCallBack();
+	if (!this.isModified('hashed_password') || this.isNew) return oCallBack();
 	this.passwordChangedAt = Date.now();
 	oCallBack();
 });
