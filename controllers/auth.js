@@ -21,9 +21,11 @@ const oFormidable = require('formidable');
  * Request Body Image
  */
 this.setRequestBodyImage = oRequest => {
-    Object.keys(oRequest.files).forEach(sKey => {
-        oRequest.body[sKey] = oRequest.files[sKey][0].filename;
-    });
+    if (typeof oRequest.files !== 'undefined') {
+        Object.keys(oRequest.files).forEach(sKey => {
+            oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+        });
+    }
     return oRequest;
 };
 
@@ -166,7 +168,7 @@ exports.registerUser = async (oRequest, oResponse) => {
     }
     return oResponse
         .status(200)
-        .send('A verification email has been sent to ' + oUserData.email + '.');
+        .send({message: 'A verification email has been sent to ' + oUserData.email + '.'});
     // return this.setTokenEmail(oUserResult, oRequest, oResponse);
 };
 
