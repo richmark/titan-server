@@ -3,16 +3,23 @@
  * routes/auth.js
  * @author Carlo Barcena <cbarcena20@gmail.com>
  * @date 11/12/2019 8:21 PM
- * @version 1.0 
+ * @version 1.0
  */
 
-
-const oExpress = require('express');
+const oExpress = require("express");
 const oRouter = oExpress.Router();
 
-const { registerUser } = require('../controllers/auth');
 const { uploadImage } = require('../middlewares/handleUserImage');
 
-oRouter.post('/register', uploadImage, registerUser);
+const {
+  registerUser,
+  userSignin,
+  userSignout,
+  requireSignin
+} = require("../controllers/auth");
+
+oRouter.post("/register", uploadImage,registerUser);
+oRouter.post("/signin", userSignin);
+oRouter.get("/signout", userSignout);
 
 module.exports = oRouter;
