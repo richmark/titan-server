@@ -12,12 +12,12 @@ const oRouter = oExpress.Router();
 const { uploadImage } = require('../middlewares/handleUserImage');
 
 const {
-	registerUser,
-	forgotPassword,
-	resetPassword,
-	confirmUser,
-	userSignin,
-	userSignout
+    registerUser,
+    forgotPassword,
+    resetPassword,
+    confirmUser,
+    userSignin,
+    userSignout
 } = require('../controllers/auth');
 
 oRouter.post('/register', uploadImage, registerUser);
