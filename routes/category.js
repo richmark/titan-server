@@ -12,7 +12,11 @@ const oRouter = oExpress.Router();
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
 
-const { createCategory } = require("../controllers/category");
+const {
+  createCategory,
+  categoryById,
+  getCategory
+} = require("../controllers/category");
 
 oRouter.post(
   "/category/create/:userId",
@@ -22,6 +26,9 @@ oRouter.post(
   createCategory
 );
 
+oRouter.get("/category/:categoryId", getCategory);
+
 oRouter.param("userId", userById);
+oRouter.param("categoryId", categoryById);
 
 module.exports = oRouter;

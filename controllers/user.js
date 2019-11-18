@@ -8,6 +8,10 @@
 
 const ModelUser = require("../models/user");
 
+/**
+ * userById middleware
+ * checks if user exist
+ */
 exports.userById = (oRequest, oResponse, next, id) => {
   ModelUser.findById(id).exec((err, user) => {
     if (err || !user) {

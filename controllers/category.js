@@ -7,11 +7,12 @@
  */
 
 const ModelCategory = require("../models/category");
-const oFormidable = require("formidable");
-const _ = require("lodash");
-const oFs = require("fs");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
+/**
+ * createCategory function
+ * Creates category
+ */
 exports.createCategory = (oRequest, oResponse) => {
   const oCategory = new ModelCategory(oRequest.body);
   oCategory.save((err, data) => {
@@ -21,5 +22,29 @@ exports.createCategory = (oRequest, oResponse) => {
       });
     }
     oResponse.json({ data });
+  });
+};
+
+/**
+ * getCategory function
+ * Gets category by ID
+ */
+exports.getCategory = (oRequest, oResponse) => {
+  return oResponse.json(oRequest.category);
+};
+
+/**
+ * categoryById middleware
+ * checks if category exists by id
+ */
+exports.categoryById = (oRequest, oResponse, next, id) => {
+  ModelCategory.findById(id).exec((err, category) => {
+    if (err || !category) {
+      return res.status(400).json({
+        error: "Category does not exist!"
+      });
+    }
+    oRequest.category = category;
+    next();
   });
 };
