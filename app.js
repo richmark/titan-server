@@ -2,22 +2,24 @@
  * Titan Ecommerce (Server)
  * App.js
  * @author Carlo Barcena <cbarcena20@gmail.com>
+ * @author Jon Aguilar <jjaguilar08@gmail.com>
  * @date 11/12/2019 8:00 PM
- * @version 1.0 
+ * @version 1.0
  */
 
-const oExpress = require('express');
-const oMongoose = require('mongoose');
-const oBodyParser = require('body-parser');
-const oCors = require('cors');
-const oExpressValidator = require('express-validator');
+const oExpress = require("express");
+const oMongoose = require("mongoose");
+const oBodyParser = require("body-parser");
+const oCors = require("cors");
+const oExpressValidator = require("express-validator");
 
-require('dotenv').config();
+require("dotenv").config();
 
 /**
  * Routes
  */
-const oAuthRoutes = require('./routes/auth');
+const oAuthRoutes = require("./routes/auth");
+const oCategoryRoutes = require("./routes/category");
 
 /**
  * App Instance
@@ -27,11 +29,13 @@ const oApp = oExpress();
 /**
  * MongoDB Connection
  */
-oMongoose.connect(process.env.DATABASE, {
-    useNewUrlParser : true,
+oMongoose
+  .connect(process.env.DATABASE, {
+    useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
-}).then(() => console.log('DB Connected'));
+  })
+  .then(() => console.log("DB Connected"));
 
 /**
  * Middlewares
@@ -41,7 +45,8 @@ oApp.use(oBodyParser.json());
 /**
  * Middlewares (routes)
  */
-oApp.use('/api/v1', oAuthRoutes);
+oApp.use("/api/v1", oAuthRoutes);
+oApp.use("/api/v1", oCategoryRoutes);
 
 /**
  * Default port 8000
@@ -49,5 +54,5 @@ oApp.use('/api/v1', oAuthRoutes);
  */
 const iPort = process.env.PORT || 8000;
 oApp.listen(iPort, () => {
-    console.log(`Server is running on port ${iPort}`);
+  console.log(`Server is running on port ${iPort}`);
 });
