@@ -86,14 +86,19 @@ exports.registerUser = (oRequest, oResponse) => {
 /**
  * Sign in user function
  */
-
-exports.signin = (oRequest, oResponse) => {
+exports.userSignin = (oRequest, oResponse) => {
   const { email, password } = oRequest.body;
 
   oUserModel.findOne({ email }, (err, user) => {
     if (!user) {
       return oResponse.status(400).json({
         error: "User with that email does not exist. Please sign up."
+      });
+    }
+
+    if (!user.verified_email) {
+      return oResponse.status(400).json({
+        error: "Log-in not allowed, please verify email!"
       });
     }
 
@@ -104,10 +109,7 @@ exports.signin = (oRequest, oResponse) => {
     }
 
     const sToken = oJwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-    //persist the token as 't' in cookie with expiry date
     oResponse.cookie("t", sToken, { expire: new Date() + 9999 });
-
-    //return response with user and token to frontend client
 
     const { _id, first_name, last_name, email, role } = user;
     return oResponse.json({
@@ -115,4 +117,53 @@ exports.signin = (oRequest, oResponse) => {
       user: { _id, first_name, last_name, email, role }
     });
   });
+};
+
+/**
+ * User Sign-out function
+ */
+exports.userSignout = (oRequest, oResponse) => {
+  oResponse.clearCookie("t");
+  return oResponse.json({ message: "Signout Success!" });
+};
+
+/**
+ * requireSignin middleware
+ * this function will require API users Bearer Token header to execute request.
+ */
+exports.requireSignin = oExpressJwt({
+  secret: process.env.JWT_SECRET,
+  userProperty: "auth"
+});
+
+/**
+ * checkAuth middleware
+ * checks if there is a profile, auth token, and same id.
+ */
+exports.checkAuth = (oRequest, oResponse, next) => {
+  let user =
+    oRequest.profile &&
+    oRequest.auth &&
+    oRequest.profile._id == oRequest.auth._id;
+
+  if (!user) {
+    return oResponse.status(403).json({
+      error: "Access Denied!"
+    });
+  }
+  next();
+};
+
+/**
+ * checkAdmin middleware
+ * checks if user has a role of admin (admin = 1, others = 0)
+ */
+exports.checkAdmin = (oRequest, oResponse, next) => {
+  if (oRequest.profile.role === 0) {
+    return oResponse.status(403).json({
+      error: "Admin resource! Access Denied!"
+    });
+  }
+
+  next();
 };

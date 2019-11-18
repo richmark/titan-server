@@ -9,9 +9,15 @@
 const oExpress = require("express");
 const oRouter = oExpress.Router();
 
-const { registerUser, signin } = require("../controllers/auth");
+const {
+  registerUser,
+  userSignin,
+  userSignout,
+  requireSignin
+} = require("../controllers/auth");
 
 oRouter.post("/register", registerUser);
-oRouter.post("/signin", signin);
+oRouter.post("/signin", userSignin);
+oRouter.get("/signout", userSignout);
 
 module.exports = oRouter;
