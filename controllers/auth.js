@@ -6,12 +6,14 @@
  * @version 1.0
  */
 
-const oUserModel = require("../models/user");
-const oTokenModel = require("../models/emailToken");
-const oJwt = require("jsonwebtoken");
-const oExpressJwt = require("express-jwt");
-const oCrypto = require("crypto");
-const oNodeMailer = require("nodemailer");
+const oUserModel = require('../models/user');
+const oTokenModel = require('../models/emailToken');
+const oJwt = require('jsonwebtoken');
+const oExpressJwt = require('express-jwt');
+const oCrypto = require('crypto');
+const oNodeMailer = require('nodemailer');
+const oFormidable = require('formidable');
+
 
 /**
  * Set Token Email
@@ -35,8 +37,6 @@ this.setTokenEmail = (oUserData, oRequest, oResponse) => {
     const oTransporter = oNodeMailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
-      secure: true,
-      pool: true,
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD
@@ -68,18 +68,30 @@ this.setTokenEmail = (oUserData, oRequest, oResponse) => {
   });
 };
 
+
+/**
+ * Request Body Image
+ */
+this.setRequestBodyImage = (oRequest) => {
+    Object.keys(oRequest.files).forEach((sKey) => {
+        oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+    });
+    return oRequest;
+};
+
 /**
  * Register User and Send Validation Email
  */
 exports.registerUser = (oRequest, oResponse) => {
-  const oUser = new oUserModel(oRequest.body);
-  oUser.save((oError, oUserData) => {
-    if (oError) {
-      return oResponse.status(400).json({
-        error: oError
-      });
-    }
-    return this.setTokenEmail(oUserData, oRequest, oResponse);
+    oRequest = this.setRequestBodyImage(oRequest);
+    const oUser = new oUserModel(oRequest.body);
+    oUser.save((oError, oUserData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error : oError 
+            });
+        }
+        return this.setTokenEmail(oUserData, oRequest, oResponse);
   });
 };
 

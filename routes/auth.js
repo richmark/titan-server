@@ -9,6 +9,8 @@
 const oExpress = require("express");
 const oRouter = oExpress.Router();
 
+const { uploadImage } = require('../middlewares/handleUserImage');
+
 const {
   registerUser,
   userSignin,
@@ -16,7 +18,7 @@ const {
   requireSignin
 } = require("../controllers/auth");
 
-oRouter.post("/register", registerUser);
+oRouter.post("/register", uploadImage,registerUser);
 oRouter.post("/signin", userSignin);
 oRouter.get("/signout", userSignout);
 
