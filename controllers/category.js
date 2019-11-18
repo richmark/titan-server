@@ -40,11 +40,46 @@ exports.getCategory = (oRequest, oResponse) => {
 exports.categoryById = (oRequest, oResponse, next, id) => {
   ModelCategory.findById(id).exec((err, category) => {
     if (err || !category) {
-      return res.status(400).json({
+      return oResponse.status(400).json({
         error: "Category does not exist!"
       });
     }
     oRequest.category = category;
     next();
+  });
+};
+
+/**
+ * deleteCategory function
+ * deletes category
+ */
+exports.deleteCategory = (oRequest, oResponse) => {
+  const oCategory = oRequest.category;
+  oCategory.remove(err => {
+    if (err) {
+      return oResponse.status(400).json({
+        error: errorHandler(err)
+      });
+    }
+    oResponse.json({
+      message: "Category deleted!"
+    });
+  });
+};
+
+/**
+ * update category function
+ * updated category
+ */
+exports.updateCategory = (oRequest, oResponse) => {
+  const oCategory = oRequest.category;
+  oCategory.name = oRequest.body.name;
+  oCategory.save((err, data) => {
+    if (err) {
+      return oResponse.status(400).json({
+        error: errorHandler(err)
+      });
+    }
+    oResponse.json(data);
   });
 };

@@ -15,7 +15,9 @@ const { userById } = require("../controllers/user");
 const {
   createCategory,
   categoryById,
-  getCategory
+  getCategory,
+  deleteCategory,
+  updateCategory
 } = require("../controllers/category");
 
 oRouter.post(
@@ -24,6 +26,22 @@ oRouter.post(
   checkAuth,
   checkAdmin,
   createCategory
+);
+
+oRouter.delete(
+  "/category/:categoryId/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  deleteCategory
+);
+
+oRouter.put(
+  "/category/:categoryId/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  updateCategory
 );
 
 oRouter.get("/category/:categoryId", getCategory);
