@@ -168,7 +168,10 @@ exports.registerUser = async (oRequest, oResponse) => {
     }
     return oResponse
         .status(200)
-        .send({message: 'A verification email has been sent to ' + oUserData.email + '.'});
+        .send({
+            message:
+                'A verification email has been sent to ' + oUserData.email + '.'
+        });
     // return this.setTokenEmail(oUserResult, oRequest, oResponse);
 };
 
