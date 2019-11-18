@@ -10,6 +10,7 @@
 const oExpress = require("express");
 const oMongoose = require("mongoose");
 const oBodyParser = require("body-parser");
+const oPath = require("path");
 const oCors = require("cors");
 const oExpressValidator = require("express-validator");
 
@@ -25,7 +26,6 @@ const oCategoryRoutes = require("./routes/category");
  * App Instance
  */
 const oApp = oExpress();
-
 /**
  * MongoDB Connection
  */
@@ -41,6 +41,7 @@ oMongoose
  * Middlewares
  */
 oApp.use(oBodyParser.json());
+oApp.use(oExpress.static(oPath.resolve("./public")));
 
 /**
  * Middlewares (routes)
