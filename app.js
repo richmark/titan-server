@@ -19,8 +19,10 @@ require("dotenv").config();
 /**
  * Routes
  */
-const oAuthRoutes = require("./routes/auth");
+const oAuthRoutes = require('./routes/auth');
+const oUserRoutes = require('./routes/user');
 const oCategoryRoutes = require("./routes/category");
+
 
 /**
  * App Instance
@@ -51,8 +53,10 @@ oApp.use(oExpress.static(oPath.resolve("./public")));
 /**
  * Middlewares (routes)
  */
-oApp.use("/api/v1", oAuthRoutes);
+oApp.use('/api/v1', oAuthRoutes);
+oApp.use('/api/v1', oUserRoutes);
 oApp.use("/api/v1", oCategoryRoutes);
+
 
 /**
  * Default port 8000

@@ -118,8 +118,8 @@ exports.checkAdmin = (oRequest, oResponse, next) => {
  * Register User and Send Validation Email
  */
 exports.registerUser = async (oRequest, oResponse) => {
+    console.log(oRequest.body);
     // Save the user
-    oRequest = this.setRequestBodyImage(oRequest);
     const oUser = new oUserModel(oRequest.body);
     const oUserData = await oUser.save();
     if (!oUserData) {
