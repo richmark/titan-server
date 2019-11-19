@@ -14,13 +14,18 @@ const { uploadImage } = require("../middlewares/handleUserImage");
 
 const {
   registerUser,
+  forgotPassword,
+  resetPassword,
+  confirmUser,
   userSignin,
-  userSignout,
-  requireSignin
+  userSignout
 } = require("../controllers/auth");
 
 oRouter.post("/register", uploadImage, registerUser);
 oRouter.post("/signin", userSignin);
 oRouter.get("/signout", userSignout);
+oRouter.get("/confirmation/:tokenId", confirmUser);
+oRouter.post("/forgot", forgotPassword);
+oRouter.patch("/reset/:tokenId", resetPassword);
 
 module.exports = oRouter;
