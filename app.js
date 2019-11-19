@@ -29,12 +29,13 @@ const oApp = oExpress();
 /**
  * MongoDB Connection
  */
-oMongoose.connect(process.env.DATABASE, {
-		useNewUrlParser: true,
-		useCreateIndex: true,
-		useUnifiedTopology: true
-	})
-	.then(() => console.log('DB Connected'));
+oMongoose
+  .connect(process.env.DATABASE, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log("DB Connected"));
 
 /**
  * Allow Cross-Origin Resource Sharing
@@ -59,9 +60,5 @@ oApp.use("/api/v1", oCategoryRoutes);
  */
 const iPort = process.env.PORT || 8000;
 oApp.listen(iPort, () => {
-<<<<<<< HEAD
   console.log(`Server is running on port ${iPort}`);
-=======
-	console.log(`Server is running on port ${iPort}`);
->>>>>>> master
 });
