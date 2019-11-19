@@ -1,4 +1,3 @@
-
 /**
  * Titan Ecommerce (Server)
  * routes/user.js
@@ -12,10 +11,11 @@ const oExpress = require("express");
 const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
-const { uploadImage } = require('../middlewares/handleUserImage');
-const { userById, updateUser } = require("../controllers/user");
+const { uploadImage } = require("../middlewares/handleUserImage");
+const { userById, updateUser, getUser } = require("../controllers/user");
 
-oRouter.put('/updateUser/:userId', uploadImage, updateUser);
+oRouter.get("/user/:userId", requireSignin, checkAuth, getUser);
+oRouter.put("/updateUser/:userId", uploadImage, updateUser);
 oRouter.param("userId", userById);
 
 module.exports = oRouter;
