@@ -9,7 +9,6 @@
 const oExpress = require('express');
 const oRouter = oExpress.Router();
 
-const { uploadImage } = require('../middlewares/handleUserImage');
 
 const {
     registerUser,
@@ -20,7 +19,7 @@ const {
     userSignout
 } = require('../controllers/auth');
 
-oRouter.post('/register', uploadImage, registerUser);
+oRouter.post('/register', registerUser);
 oRouter.post('/signin', userSignin);
 oRouter.get('/signout', userSignout);
 oRouter.get('/confirmation/:tokenId', confirmUser);
