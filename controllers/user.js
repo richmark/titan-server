@@ -1,12 +1,30 @@
 /**
  * Titan Ecommerce (Server)
- * controllers/auth.js
+ * controllers/user.js
+ * @author Jon Aguilar <jjaguilar08@gmail.com>
  * @author Carlo Barcena <cbarcena20@gmail.com>
- * @date 11/19/2019 8:27 AM
+ * @date 11/18/2019
  * @version 1.0
  */
 
+ 
 const oUserModel = require('../models/user');
+
+/**
+ * userById middleware
+ * checks if user exist
+ */
+exports.userById = (oRequest, oResponse, oNext, sId) => {
+    oUserModel.findById(sId).exec((oError, oUserData) => {
+        if (oError || !oUserData) {
+            return oResponse.status(400).json({
+                error: 'User not found'
+            });
+        }
+        oRequest.profile = oUserData;
+        oNext();
+    });
+};
 
 /**
  * Request Body Image
@@ -20,17 +38,6 @@ this.setRequestBodyImage = oRequest => {
     return oRequest;
 };
 
-exports.userById = (oRequest, oResponse, oNext, sId) => {
-    oUserModel.findById(sId).exec((oError, oUserData) => {
-        if (oError) {
-            return oRes.status(400).json({
-                error: 'User not found'
-            });
-        }
-        oRequest.profile = oUserData;
-        oNext();
-    });
-};
 
 exports.updateUser = (oRequest, oResponse) => {
     oRequest = this.setRequestBodyImage(oRequest);
@@ -54,3 +61,4 @@ exports.updateUser = (oRequest, oResponse) => {
 
     });
 };
+
