@@ -52,3 +52,71 @@ exports.listProducts = (oRequest, oResponse) => {
       oResponse.json(oData);
     });
 };
+
+/**
+ * productById middleware
+ * this functions checks if the product id exists before proceeding to the next function
+ */
+exports.productById = (oRequest, oResponse, oNext, sId) => {
+  oProductModel.findById(sId).exec((oError, oProduct) => {
+    if (oError || !oProduct) {
+      oResponse.status(400).json({
+        error: "Product not found"
+      });
+    }
+    oRequest.product = oProduct;
+    oNext();
+  });
+};
+
+/**
+ * getProductById function
+ * gets a product with a particular product id
+ */
+exports.getProductById = (oRequest, oResponse) => {
+  return oResponse.json(oRequest.product);
+};
+
+/**
+ * listBySearch function
+ * this function accepts filters for product searching
+ */
+exports.listBySearch = (oRequest, oResponse) => {
+  let order = oRequest.body.order ? oRequest.body.order : "desc";
+  let sortBy = oRequest.body.sortBy ? oRequest.body.sortBy : "_id";
+  let limit = oRequest.body.limit ? parseInt(oRequest.body.limit) : 100;
+  let skip = parseInt(oRequest.body.skip);
+  let findArgs = {};
+
+  for (let key in oRequest.body.filters) {
+    if (oRequest.body.filters[key].length > 0) {
+      if (key === "price") {
+        findArgs[key] = {
+          $gte: oRequest.body.filters[key][0],
+          $lte: oRequest.body.filters[key][1]
+        };
+      } else {
+        findArgs[key] = oRequest.body.filters[key];
+      }
+    }
+  }
+
+  oProductModel
+    .find(findArgs)
+    .select()
+    .populate("category")
+    .sort([[sortBy, order]])
+    .skip(skip)
+    .limit(limit)
+    .exec((err, data) => {
+      if (err) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      oResponse.json({
+        size: data.length,
+        data
+      });
+    });
+};
