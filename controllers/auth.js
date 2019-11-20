@@ -166,12 +166,10 @@ exports.registerUser = async (oRequest, oResponse) => {
             error: oMailData
         });
     }
-    return oResponse
-        .status(200)
-        .send({
-            message:
-                'A verification email has been sent to ' + oUserData.email + '.'
-        });
+    return oResponse.status(200).send({
+        message:
+            'A verification email has been sent to ' + oUserData.email + '.'
+    });
     // return this.setTokenEmail(oUserResult, oRequest, oResponse);
 };
 
@@ -179,7 +177,7 @@ exports.forgotPassword = async (oRequest, oResponse) => {
     // get user based on posted email
     const oUser = await oUserModel.findOne({ email: oRequest.body.email });
     if (!oUser) {
-        return oResponse.status(401).json({ error: oUser });
+        return oResponse.status(401).json({ error: 'User not found' });
     }
 
     // then generate random token
