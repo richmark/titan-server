@@ -3,6 +3,7 @@
  * controllers/auth.js
  * @author Carlo Barcena <cbarcena20@gmail.com>
  * @author Richmark Jinn Ravina <richmark.jinn.ravina@gmail.com>
+ * @author Jon Aguilar <jjaguilar08@gmail.com>
  * @date 11/12/2019 8:22 PM
  * @version 1.0
  */
@@ -16,6 +17,8 @@ const oNodeMailer = require('nodemailer');
 const { setEmailOptions, getTransporter } = require('../library/EmailLibrary');
 const { FRONT_DOMAIN } = require('../config');
 const oFormidable = require('formidable');
+
+const { errorHandler } = require('../helpers/dbErrorHandler');
 
 /**
  * Request Body Image
@@ -35,29 +38,29 @@ this.setRequestBodyImage = oRequest => {
 exports.userSignin = (oRequest, oResponse) => {
     const { email, password } = oRequest.body;
 
-    oUserModel.findOne({ email }, (err, user) => {
-        if (!user) {
+    oUserModel.findOne({ email }, (err, oUser) => {
+        if (!oUser) {
             return oResponse.status(400).json({
                 error: 'User with that email does not exist. Please sign up.'
             });
         }
 
-        if (!user.verified_email) {
+        if (!oUser.verified_email) {
             return oResponse.status(400).json({
                 error: 'Log-in not allowed, please verify email!'
             });
         }
 
-        if (!user.authenticatePassword(password)) {
+        if (!oUser.authenticatePassword(password)) {
             return oResponse
                 .status(401)
                 .json({ error: 'Email and password dont match' });
         }
 
-        const sToken = oJwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+        const sToken = oJwt.sign({ _id: oUser._id }, process.env.JWT_SECRET);
         oResponse.cookie('t', sToken, { expire: new Date() + 9999 });
 
-        const { _id, first_name, last_name, email, role } = user;
+        const { _id, first_name, last_name, email, role } = oUser;
         return oResponse.json({
             sToken,
             user: { _id, first_name, last_name, email, role }
@@ -86,32 +89,32 @@ exports.requireSignin = oExpressJwt({
  * checkAuth middleware
  * checks if there is a profile, auth token, and same id.
  */
-exports.checkAuth = (oRequest, oResponse, next) => {
-    let user =
+exports.checkAuth = (oRequest, oResponse, oNext) => {
+    let oUser =
         oRequest.profile &&
         oRequest.auth &&
         oRequest.profile._id == oRequest.auth._id;
 
-    if (!user) {
+    if (!oUser) {
         return oResponse.status(403).json({
             error: 'Access Denied!'
         });
     }
-    next();
+    oNext();
 };
 
 /**
  * checkAdmin middleware
  * checks if user has a role of admin (admin = 1, others = 0)
  */
-exports.checkAdmin = (oRequest, oResponse, next) => {
+exports.checkAdmin = (oRequest, oResponse, oNext) => {
     if (oRequest.profile.role === 0) {
         return oResponse.status(403).json({
             error: 'Admin resource! Access Denied!'
         });
     }
 
-    next();
+    oNext();
 };
 
 /**
@@ -119,9 +122,16 @@ exports.checkAdmin = (oRequest, oResponse, next) => {
  */
 exports.registerUser = async (oRequest, oResponse) => {
     // Save the user
-    oRequest = this.setRequestBodyImage(oRequest);
     const oUser = new oUserModel(oRequest.body);
-    const oUserData = await oUser.save();
+    let oUserData;
+    try {
+        oUserData = await oUser.save();
+    } catch (oError) {
+        return oResponse.status(400).json({
+            error: errorHandler(oError)
+        });
+    }
+
     if (!oUserData) {
         return oResponse.status(400).json({
             error: oUserData
