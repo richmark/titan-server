@@ -1,7 +1,5 @@
 node_modules
 public/images/users/user-*
-<<<<<<< HEAD
 .env
-=======
-.env
->>>>>>> master
+package-lock.json
+
