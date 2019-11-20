@@ -6,7 +6,7 @@
  * @version 1.0
  */
 
-const ModelCategory = require("../models/category");
+const oCategoryModel = require("../models/category");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
 /**
@@ -14,14 +14,14 @@ const { errorHandler } = require("../helpers/dbErrorHandler");
  * Creates category
  */
 exports.createCategory = (oRequest, oResponse) => {
-  const oCategory = new ModelCategory(oRequest.body);
-  oCategory.save((err, data) => {
-    if (err) {
+  const oCategory = new oCategoryModel(oRequest.body);
+  oCategory.save((oError, oData) => {
+    if (oError) {
       return oResponse.status(400).json({
-        error: errorHandler(err)
+        error: errorHandler(oError)
       });
     }
-    oResponse.json({ data });
+    oResponse.json({ oData });
   });
 };
 
@@ -37,15 +37,15 @@ exports.getCategory = (oRequest, oResponse) => {
  * categoryById middleware
  * checks if category exists by id
  */
-exports.categoryById = (oRequest, oResponse, next, id) => {
-  ModelCategory.findById(id).exec((err, category) => {
-    if (err || !category) {
+exports.categoryById = (oRequest, oResponse, oNext, sId) => {
+  oCategoryModel.findById(sId).exec((oError, oCategory) => {
+    if (oError || !oCategory) {
       return oResponse.status(400).json({
         error: "Category does not exist!"
       });
     }
-    oRequest.category = category;
-    next();
+    oRequest.category = oCategory;
+    oNext();
   });
 };
 
@@ -55,10 +55,10 @@ exports.categoryById = (oRequest, oResponse, next, id) => {
  */
 exports.deleteCategory = (oRequest, oResponse) => {
   const oCategory = oRequest.category;
-  oCategory.remove(err => {
-    if (err) {
+  oCategory.remove(oError => {
+    if (oError) {
       return oResponse.status(400).json({
-        error: errorHandler(err)
+        error: errorHandler(oError)
       });
     }
     oResponse.json({
@@ -74,12 +74,27 @@ exports.deleteCategory = (oRequest, oResponse) => {
 exports.updateCategory = (oRequest, oResponse) => {
   const oCategory = oRequest.category;
   oCategory.name = oRequest.body.name;
-  oCategory.save((err, data) => {
-    if (err) {
+  oCategory.save((oError, oData) => {
+    if (oError) {
       return oResponse.status(400).json({
-        error: errorHandler(err)
+        error: errorHandler(oError)
       });
     }
-    oResponse.json(data);
+    oResponse.json(oData);
+  });
+};
+
+/**
+ * listCategory function
+ * gets list of all categories
+ */
+exports.listCategory = (oRequest, oResponse) => {
+  oCategoryModel.find().exec((oError, oData) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: errorHandler(oError)
+      });
+    }
+    oResponse.json(oData);
   });
 };

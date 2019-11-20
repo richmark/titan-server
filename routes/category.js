@@ -17,7 +17,8 @@ const {
   categoryById,
   getCategory,
   deleteCategory,
-  updateCategory
+  updateCategory,
+  listCategory
 } = require("../controllers/category");
 
 oRouter.post(
@@ -44,6 +45,7 @@ oRouter.put(
   updateCategory
 );
 
+oRouter.get("/category", listCategory);
 oRouter.get("/category/:categoryId", getCategory);
 
 oRouter.param("userId", userById);
