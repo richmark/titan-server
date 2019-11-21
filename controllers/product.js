@@ -120,3 +120,83 @@ exports.listBySearch = (oRequest, oResponse) => {
       });
     });
 };
+
+/**
+ * listRelated function
+ * lists products with the same category except the product itself
+ */
+exports.listRelated = (oRequest, oResponse) => {
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+
+  oProductModel
+    .find({
+      _id: { $ne: oRequest.product },
+      category: oRequest.product.category
+    })
+    .limit(iLimit)
+    .populate("category", "_id name")
+    .exec((oError, oProduct) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      oResponse.json(oProduct);
+    });
+};
+
+/**
+ * listCategories function
+ * lists categories of products
+ */
+exports.listCategories = (oRequest, oResponse) => {
+  oProductModel.distinct("category", {}, (oError, oCategories) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: "Categories not found"
+      });
+    }
+    oResponse.json(oCategories);
+  });
+};
+
+/**
+ * update product function
+ * updates products
+ */
+exports.updateProduct = (oRequest, oResponse) => {
+  const oProduct = oRequest.product;
+  oProduct.product_name = oRequest.body.product_name;
+  oProduct.price = oRequest.body.price;
+  oProduct.stock = oRequest.body.stock;
+  oProduct.description = oRequest.body.description;
+  oProduct.image_url = oRequest.body.image_url;
+  oProduct.sold = oRequest.body.sold;
+
+  oProduct.save((oError, oData) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: errorHandler(oError)
+      });
+    }
+    oResponse.json(oData);
+  });
+};
+
+/**
+ * deleteProduct function
+ * this function deletes product by id
+ */
+exports.deleteProduct = (oRequest, oResponse) => {
+  let oProduct = oRequest.product;
+  oProduct.remove(oError => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: errorHandler(oError)
+      });
+    }
+    oResponse.json({
+      message: "Product deleted successfully!"
+    });
+  });
+};
