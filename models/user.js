@@ -50,6 +50,11 @@ const oUserSchema = new oMongoose.Schema(
       trim: true,
       maxlength: 50
     },
+    company_address: {
+      type: String,
+      trim: true,
+      maxlength: 65000
+    },
     tin: {
       type: String,
       trim: true,
