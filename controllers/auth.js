@@ -219,7 +219,7 @@ exports.forgotPassword = async (oRequest, oResponse) => {
         });
     }
     return oResponse.status(200).send({
-        message: `We send a reset link to this email: ${oUser.email}. Thank you.`
+        message: oUser.email
     });
 };
 
