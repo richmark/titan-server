@@ -12,8 +12,12 @@ const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { uploadImage } = require("../middlewares/handleUserImage");
-const { userById, updateUser, getUser } = require("../controllers/user");
+const { userById, updateUser, getUser, getAllUsers } = require("../controllers/user");
 
+/**
+ * TODO: add proper middlewares
+ */
+oRouter.get("/users", getAllUsers);
 oRouter.get("/user/:userId", requireSignin, checkAuth, getUser);
 oRouter.put("/updateUser/:userId", uploadImage, updateUser);
 oRouter.param("userId", userById);

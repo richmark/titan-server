@@ -70,3 +70,30 @@ exports.getUser = (oRequest, oResponse) => {
 
   return oResponse.json(oRequest.profile);
 };
+
+/**
+ * TODO: get all verified emails with non admin and non personal role
+ */
+exports.getAllUsers = (oRequest, oResponse) => {
+  oUserModel.find({ role: { $ne: 1 }, verified_email: { $ne: false }})
+  .select('email first_name last_name mobile_number address company_name company_address tin verified_email verified_admin role')
+  .exec((oError, oUserData) => {
+    if (oError || !oUserData) {
+      return oResponse.status(400).json({
+        error: "User not found"
+      });
+    }
+    return oResponse.status(200).json({
+      data: oUserData
+    });
+  });
+  // oUserModel.findById(sId).exec((oError, oUserData) => {
+  //   if (oError || !oUserData) {
+  //     return oResponse.status(400).json({
+  //       error: "User not found"
+  //     });
+  //   }
+  //   oRequest.profile = oUserData;
+  //   oNext();
+  // });
+};
