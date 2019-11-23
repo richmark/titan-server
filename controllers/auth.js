@@ -51,6 +51,12 @@ exports.userSignin = (oRequest, oResponse) => {
             });
         }
 
+        if (!oUser.verified_admin && oUser.role === 3) {
+            return oResponse.status(400).json({
+                error: 'Log-in not allowed, please wait for admin approval!'
+            });
+        }
+
         if (!oUser.authenticatePassword(password)) {
             return oResponse
                 .status(401)
@@ -120,7 +126,7 @@ exports.checkAdmin = (oRequest, oResponse, oNext) => {
 /**
  * Register User and Send Validation Email
  */
-exports.registerUser = async (oRequest, oResponse) => {
+this.saveRegisterUser = async (oRequest, oResponse) => {
     // Save the user
     const oUser = new oUserModel(oRequest.body);
     let oUserData;
@@ -132,11 +138,6 @@ exports.registerUser = async (oRequest, oResponse) => {
         });
     }
 
-    if (!oUserData) {
-        return oResponse.status(400).json({
-            error: oUserData
-        });
-    }
     // Create a verification token for this user
     const oToken = new oTokenModel({
         _userId: oUserData._id,
@@ -157,9 +158,9 @@ exports.registerUser = async (oRequest, oResponse) => {
         subject: 'Titan Supertools Account Verification',
         text:
             'Hello,\n\n' +
-            'Please verify your account by clicking the link: \n\nhttp://' +
-            oRequest.headers.host +
-            '/api/v1/confirmation/' +
+            'Please verify your account by clicking the link: \n\n' +
+            FRONT_DOMAIN +
+            '/verify/' +
             oToken.token +
             '.\n',
         html: '',
@@ -181,6 +182,24 @@ exports.registerUser = async (oRequest, oResponse) => {
             'A verification email has been sent to ' + oUserData.email + '.'
     });
     // return this.setTokenEmail(oUserResult, oRequest, oResponse);
+};
+
+/**
+ * Register User and check if user exists
+ */
+exports.registerUser = (oRequest, oResponse) => {
+
+    const { email } = oRequest.body;
+
+    // Check if email exists
+    oUserModel.findOne({email}, (oError, oUserData) => {
+        if (oUserData) {
+            return oResponse.status(400).json({
+                error: 'Email already exists!'
+            });
+        }
+        return this.saveRegisterUser(oRequest, oResponse);
+    });
 };
 
 exports.forgotPassword = async (oRequest, oResponse) => {
@@ -292,5 +311,8 @@ exports.confirmUser = async (oRequest, oResponse) => {
     }
     return oResponse
         .status(200)
-        .send('The account has been verified. Please log in.');
+        .send({
+            type: 'verified',
+            msg: 'The account has been verified. Please Log in.'
+        });
 };
