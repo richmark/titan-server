@@ -25,7 +25,6 @@ const buildUniqueMessage = error => {
   } catch (oExpection) {
     sOutput = "Unique field already exists";
   }
-
   return sOutput;
 };
 
@@ -50,6 +49,5 @@ exports.errorHandler = error => {
         sMessage = error.errors[errorName].message;
     }
   }
-
   return sMessage;
 };
