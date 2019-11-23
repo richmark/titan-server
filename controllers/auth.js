@@ -47,7 +47,8 @@ exports.userSignin = (oRequest, oResponse) => {
 
         if (!oUser.verified_email) {
             return oResponse.status(400).json({
-                error: 'Log-in not allowed, please verify email!'
+                error: 'Log-in not allowed, please verify email!',
+                email: oUser.email
             });
         }
 
@@ -124,20 +125,9 @@ exports.checkAdmin = (oRequest, oResponse, oNext) => {
 };
 
 /**
- * Register User and Send Validation Email
+ * Create Verification Token
  */
-this.saveRegisterUser = async (oRequest, oResponse) => {
-    // Save the user
-    const oUser = new oUserModel(oRequest.body);
-    let oUserData;
-    try {
-        oUserData = await oUser.save();
-    } catch (oError) {
-        return oResponse.status(400).json({
-            error: errorHandler(oError)
-        });
-    }
-
+this.createVerificationToken = async (oUserData, oResponse) => {
     // Create a verification token for this user
     const oToken = new oTokenModel({
         _userId: oUserData._id,
@@ -181,7 +171,40 @@ this.saveRegisterUser = async (oRequest, oResponse) => {
         message:
             'A verification email has been sent to ' + oUserData.email + '.'
     });
-    // return this.setTokenEmail(oUserResult, oRequest, oResponse);
+};
+
+/**
+ * Resend Verification Token
+ */
+exports.resendVerificationToken = (oRequest, oResponse) => {
+    const { email } = oRequest.body;
+    // Check if email exists
+    oUserModel.findOne({email}, (oError, oUserData) => {
+        if (oUserData) {
+            return this.createVerificationToken(oUserData, oResponse);
+        }
+        return oResponse.status(400).json({
+            error: 'Email not yet registered!'
+        });
+    });
+};
+
+/**
+ * Register User and Send Validation Email
+ */
+this.saveRegisterUser = async (oRequest, oResponse) => {
+    // Save the user
+    const oUser = new oUserModel(oRequest.body);
+    let oUserData;
+    try {
+        oUserData = await oUser.save();
+    } catch (oError) {
+        return oResponse.status(400).json({
+            error: errorHandler(oError)
+        });
+    }
+
+    return this.createVerificationToken(oUserData, oResponse);
 };
 
 /**

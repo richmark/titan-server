@@ -16,11 +16,13 @@ const {
   resetPassword,
   confirmUser,
   userSignin,
-  userSignout
+  userSignout,
+  resendVerificationToken
 } = require("../controllers/auth");
 
 oRouter.post('/register', registerUser);
 oRouter.post('/signin', userSignin);
+oRouter.post('/resendVerification', resendVerificationToken);
 oRouter.get('/signout', userSignout);
 oRouter.get('/confirmation/:tokenId', confirmUser);
 oRouter.post('/forgot', forgotPassword);
