@@ -72,11 +72,11 @@ exports.getUser = (oRequest, oResponse) => {
 };
 
 /**
- * TODO: get all verified emails with non admin and non personal role
+ * Get all verified emails with non admin and non personal role
  */
-exports.getAllUsers = (oRequest, oResponse) => {
-  oUserModel.find({ role: { $ne: 1 }, verified_email: { $ne: false }})
-  .select('email first_name last_name mobile_number address company_name company_address tin verified_email verified_admin role')
+exports.getAllWholesalers = (oRequest, oResponse) => {
+  oUserModel.find({ role: { $nin: [1, 2] }, verified_email: { $ne: false }})
+  .select('company_name verified_admin')
   .exec((oError, oUserData) => {
     if (oError || !oUserData) {
       return oResponse.status(400).json({
@@ -87,13 +87,28 @@ exports.getAllUsers = (oRequest, oResponse) => {
       data: oUserData
     });
   });
-  // oUserModel.findById(sId).exec((oError, oUserData) => {
-  //   if (oError || !oUserData) {
-  //     return oResponse.status(400).json({
-  //       error: "User not found"
-  //     });
-  //   }
-  //   oRequest.profile = oUserData;
-  //   oNext();
-  // });
 };
+
+/**
+ * userById middleware
+ * checks if user exist
+ */
+exports.wholesalerById = (oRequest, oResponse, oNext, sId) => {
+  oUserModel.findById(sId)
+  .select('-hashed_password -salt -role -passwordResetToken -passwordResetExpires -passwordChangedAt')
+  .exec((oError, oUserData) => {
+    if (oError || !oUserData) {
+      return oResponse.status(400).json({
+        error: "User not found"
+      });
+    }
+    oRequest.wholesaler = oUserData;
+    oNext();
+  });
+};
+
+exports.getWholesaler = (oRequest, oResponse) => {
+  return oResponse.status(200).json({
+    data: oRequest.wholesaler,
+  });
+}
