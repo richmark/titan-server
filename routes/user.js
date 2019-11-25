@@ -12,10 +12,18 @@ const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { uploadImage } = require("../middlewares/handleUserImage");
-const { userById, updateUser, getUser } = require("../controllers/user");
+const { userById, updateUser, getUser, getAllWholesalers, wholesalerById, getWholesaler, updateWholesaler } = require("../controllers/user");
+
+/**
+ * TODO: add proper middlewares
+ */
+oRouter.get("/users/:userId/wholesaler/:wholesalerId", requireSignin, checkAuth, checkAdmin, getWholesaler);
+oRouter.put("/users/:userId/wholesaler/:wholesalerId", requireSignin, checkAuth, checkAdmin, updateWholesaler);
+oRouter.get("/users/:userId", requireSignin, checkAuth, checkAdmin, getAllWholesalers);
 
 oRouter.get("/user/:userId", requireSignin, checkAuth, getUser);
 oRouter.put("/updateUser/:userId", uploadImage, updateUser);
 oRouter.param("userId", userById);
+oRouter.param("wholesalerId", wholesalerById);
 
 module.exports = oRouter;

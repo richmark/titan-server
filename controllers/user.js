@@ -70,3 +70,71 @@ exports.getUser = (oRequest, oResponse) => {
 
   return oResponse.json(oRequest.profile);
 };
+
+/**
+ * Get all verified emails with non admin and non personal role
+ */
+exports.getAllWholesalers = (oRequest, oResponse) => {
+  oUserModel.find({ role: { $nin: [1, 2] }, verified_email: { $ne: false }})
+  .select('company_name verified_admin')
+  .exec((oError, oUserData) => {
+    if (oError || !oUserData) {
+      return oResponse.status(400).json({
+        error: "User not found"
+      });
+    }
+    return oResponse.status(200).json({
+      data: oUserData
+    });
+  });
+};
+
+/**
+ * userById middleware
+ * checks if user exist
+ */
+exports.wholesalerById = (oRequest, oResponse, oNext, sId) => {
+  oUserModel.findById(sId)
+  .select('-hashed_password -salt -role -passwordResetToken -passwordResetExpires -passwordChangedAt')
+  .exec((oError, oUserData) => {
+    if (oError || !oUserData) {
+      return oResponse.status(400).json({
+        error: "User not found"
+      });
+    }
+    oRequest.wholesaler = oUserData;
+    oNext();
+  });
+};
+
+exports.getWholesaler = (oRequest, oResponse) => {
+  return oResponse.status(200).json({
+    data: oRequest.wholesaler,
+  });
+}
+
+exports.updateWholesaler = (oRequest, oResponse) => {
+  oUserModel.findOneAndUpdate(
+    {
+      _id: oRequest.wholesaler._id
+    },
+    {
+      $set: oRequest.body
+    },
+    {
+      new: true
+    },
+    (oError, oUserData) => {
+      if (oError === true) {
+        return oResponse.status(400).json({
+          error: "You are not authorized to perform this action"
+        });
+      }
+      oUserData.hashed_password = undefined;
+      oUserData.salt = undefined;
+      oResponse.json({
+        data: oUserData
+      });
+    }
+  );
+}
