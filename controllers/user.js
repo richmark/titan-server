@@ -112,3 +112,29 @@ exports.getWholesaler = (oRequest, oResponse) => {
     data: oRequest.wholesaler,
   });
 }
+
+exports.updateWholesaler = (oRequest, oResponse) => {
+  oUserModel.findOneAndUpdate(
+    {
+      _id: oRequest.wholesaler._id
+    },
+    {
+      $set: oRequest.body
+    },
+    {
+      new: true
+    },
+    (oError, oUserData) => {
+      if (oError === true) {
+        return oResponse.status(400).json({
+          error: "You are not authorized to perform this action"
+        });
+      }
+      oUserData.hashed_password = undefined;
+      oUserData.salt = undefined;
+      oResponse.json({
+        data: oUserData
+      });
+    }
+  );
+}
