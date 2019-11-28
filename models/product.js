@@ -27,7 +27,7 @@ const oProductSchema = new oMongoose.Schema(
       required: true,
       maxLength: 2000
     },
-    image_url: {
+    image: {
       type: String,
       trim: true,
       required: true,

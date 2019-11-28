@@ -7,13 +7,27 @@
  */
 
 const oProductModel = require("../models/product");
+const oFormidable = require("formidable");
 const { errorHandler } = require("../helpers/dbErrorHandler");
+
+/**
+ * sets product image
+ */
+this.setRequestBodyImage = oRequest => {
+  if (typeof oRequest.files !== "undefined") {
+    Object.keys(oRequest.files).forEach(sKey => {
+      oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+    });
+  }
+  return oRequest;
+};
 
 /**
  * registerProduct function
  * this function registers products in DB
  */
 exports.registerProduct = (oRequest, oResponse) => {
+  oRequest = this.setRequestBodyImage(oRequest);
   const oProduct = new oProductModel(oRequest.body);
   oProduct.save((oError, oData) => {
     if (oError) {

@@ -14,12 +14,14 @@ const {
   deleteProduct
 } = require("../controllers/product");
 const { userById } = require("../controllers/user");
+const { uploadImage } = require("../middlewares/handleProductImage");
 
 oRouter.post(
   "/product/create/:userId",
   requireSignin,
   checkAuth,
   checkAdmin,
+  uploadImage,
   registerProduct
 );
 
