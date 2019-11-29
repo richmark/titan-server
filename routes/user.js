@@ -22,8 +22,9 @@ oRouter.put("/users/:userId/wholesaler/:wholesalerId", requireSignin, checkAuth,
 oRouter.get("/users/:userId", requireSignin, checkAuth, checkAdmin, getAllWholesalers);
 
 oRouter.get("/user/:userId", requireSignin, checkAuth, getUser);
-oRouter.put("/updateUser/:userId", uploadImage, updateUser);
+oRouter.put("/user/:userId", requireSignin, uploadImage, updateUser);
 oRouter.param("userId", userById);
 oRouter.param("wholesalerId", wholesalerById);
 
 module.exports = oRouter;
+
