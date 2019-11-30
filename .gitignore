@@ -2,4 +2,3 @@ node_modules
 public/images/users/user-*
 .env
 package-lock.json
-
