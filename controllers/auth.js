@@ -52,12 +52,6 @@ exports.userSignin = (oRequest, oResponse) => {
             });
         }
 
-        if (!oUser.verified_admin && oUser.role === 3) {
-            return oResponse.status(400).json({
-                error: 'Log-in not allowed, please wait for admin approval!'
-            });
-        }
-
         if (!oUser.authenticatePassword(password)) {
             return oResponse
                 .status(401)
@@ -67,10 +61,10 @@ exports.userSignin = (oRequest, oResponse) => {
         const sToken = oJwt.sign({ _id: oUser._id }, process.env.JWT_SECRET);
         oResponse.cookie('t', sToken, { expire: new Date() + 9999 });
 
-        const { _id, first_name, last_name, email, role, mobile_number, address } = oUser;
+        const { _id, first_name, last_name, email, role, mobile_number, address, verified_admin, store_front, company_bir, mayor_permit } = oUser;
         return oResponse.json({
             sToken,
-            user: { _id, first_name, last_name, email, role, mobile_number, address }
+            user: { _id, first_name, last_name, email, role, mobile_number, address, verified_admin, store_front, company_bir, mayor_permit}
         });
     });
 };
