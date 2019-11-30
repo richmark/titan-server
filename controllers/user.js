@@ -37,6 +37,39 @@ this.setRequestBodyImage = oRequest => {
   return oRequest;
 };
 
+/**
+ * Update User Password
+ */
+exports.updateUserPassword = (oRequest, oResponse) => {
+  oUserModel.findById(oRequest.profile._id).exec((oError, oUserData) => {
+    if (!oUserData.authenticatePassword(oRequest.body.current_password)) {
+      return oResponse.status(401).json({ error: 'Invalid Password!' });
+    }
+    delete oRequest.body.current_password;
+    return this.changeUserPassword(oRequest, oResponse);
+  });
+  
+};
+
+/**
+ * Change User Password
+ */
+this.changeUserPassword = async (oRequest, oResponse) => {
+  
+  const oUserData = await oUserModel.findOne({
+    _id: oRequest.profile._id,
+  });
+
+  oUserData.password = oRequest.body.password;
+  const oSavedData = await oUserData.save();
+  if (!oSavedData) {
+    return oResponse.status(401).send({
+        error: 'Unable to change password.'
+    });
+  }
+  return oResponse.status(200).send({ message: 'Successfully changed your password.' });
+};
+
 exports.updateUser = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);
   oUserModel.findOneAndUpdate(
