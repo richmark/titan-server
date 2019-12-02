@@ -46,7 +46,7 @@ exports.errorHandler = error => {
   } else {
     for (let sErrorName in error.errors) {
       if (error.errors[sErrorName].message)
-        sMessage = error.errors[errorName].message;
+        sMessage = error.errors[sErrorName].message;
     }
   }
   return sMessage;

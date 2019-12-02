@@ -9,11 +9,21 @@
 const oCategoryModel = require("../models/category");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
+this.setRequestBodyImage = oRequest => {
+  if (typeof oRequest.files !== "undefined") {
+    Object.keys(oRequest.files).forEach(sKey => {
+      oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+    });
+  }
+  return oRequest;
+};
+
 /**
  * createCategory function
  * Creates category
  */
 exports.createCategory = (oRequest, oResponse) => {
+  oRequest = this.setRequestBodyImage(oRequest);
   const oCategory = new oCategoryModel(oRequest.body);
   oCategory.save((oError, oData) => {
     if (oError) {
@@ -21,7 +31,7 @@ exports.createCategory = (oRequest, oResponse) => {
         error: errorHandler(oError)
       });
     }
-    oResponse.json({ oData });
+    oResponse.json({ data: oData });
   });
 };
 
@@ -95,6 +105,6 @@ exports.listCategory = (oRequest, oResponse) => {
         error: errorHandler(oError)
       });
     }
-    oResponse.json(oData);
+    oResponse.json({ data: oData });
   });
 };

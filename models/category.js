@@ -17,7 +17,7 @@ const oCategorySchema = new oMongoose.Schema(
       maxLength: 32,
       unique: true
     },
-    image_url: {
+    category_image: {
       type: String,
       trim: true,
       required: true,
