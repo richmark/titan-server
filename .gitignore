@@ -1,4 +1,5 @@
 node_modules
 public/images/users/user-*
+public/images/categories/category-*
 .env
 package-lock.json

@@ -11,7 +11,7 @@ const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
-
+const { uploadImage } = require("../middlewares/handleCategoryImage");
 const {
   createCategory,
   categoryById,
@@ -26,6 +26,7 @@ oRouter.post(
   requireSignin,
   checkAuth,
   checkAdmin,
+  uploadImage,
   createCategory
 );
 
@@ -42,6 +43,7 @@ oRouter.put(
   requireSignin,
   checkAuth,
   checkAdmin,
+  uploadImage,
   updateCategory
 );
 
