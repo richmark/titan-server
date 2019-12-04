@@ -35,7 +35,7 @@ exports.registerProduct = (oRequest, oResponse) => {
         error: errorHandler(oError)
       });
     }
-    oResponse.json({ oData });
+    oResponse.json({ data: oData });
   });
 };
 
@@ -63,7 +63,7 @@ exports.listProducts = (oRequest, oResponse) => {
           error: "Products not found"
         });
       }
-      oResponse.json(oData);
+      oResponse.json({ data: oData });
     });
 };
 
