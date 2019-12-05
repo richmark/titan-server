@@ -16,7 +16,7 @@ const oStorage = oMulter.diskStorage({
   filename: (oRequest, oFile, oCallback) => {
     console.log(oFile);
     const sExtension = oFile.mimetype.split("/")[1];
-    const sId = `user-${oRequest.profile._id}-${oFile.fieldname}.${sExtension}`;
+    const sId = `product-${oRequest.profile._id}-${oFile.fieldname}.${sExtension}`;
     oCallback(null, sId);
   }
 });

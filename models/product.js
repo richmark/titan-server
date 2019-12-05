@@ -36,6 +36,10 @@ const oProductSchema = new oMongoose.Schema(
     sold: {
       type: Number,
       default: 0
+    },
+    additional_info: {
+      type: String,
+      maxLength: 2000
     }
   },
   { timestamps: true }
