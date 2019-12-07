@@ -28,6 +28,7 @@ this.setRequestBodyImage = oRequest => {
  */
 exports.registerProduct = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);
+  oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
   const oProduct = new oProductModel(oRequest.body);
   oProduct.save((oError, oData) => {
     if (oError) {

@@ -38,8 +38,8 @@ const oProductSchema = new oMongoose.Schema(
       default: 0
     },
     additional_info: {
-      type: String,
-      maxLength: 2000
+      type: Array,
+      default: []
     }
   },
   { timestamps: true }
