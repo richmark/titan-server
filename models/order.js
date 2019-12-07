@@ -6,13 +6,14 @@
  * @version 1.0
  */
 
-const oMongoose = require("mongoose");
+const oMongoose = require('mongoose');
+const { ObjectId } = oMongoose.Schema;
 
 const oOrderedProductSchema = new oMongoose.Schema(
     {
         product: { 
             type: ObjectId,
-            ref: 'Product',
+            ref: "Product",
             required: true
         },
         price: {
@@ -23,26 +24,28 @@ const oOrderedProductSchema = new oMongoose.Schema(
             type: Number,
             required: true
         }
-    }
+    },
+    { _id : false }
 );
 
-module.exports = oMongoose.model("OrderedProduct", oOrderedProductSchema);
+module.exports = oMongoose.model('OrderedProduct', oOrderedProductSchema);
 
 const oOrderSchema = new oMongoose.Schema(
   {
     user: {
         type: ObjectId,
-        ref: "User",
+        ref: 'User',
         required: true
     },
     shipper: {
         type: ObjectId,
-        ref: "Shipper",
+        ref: 'Shipper',
         required: true
     },
     status: {
         type: String,
-        required: true
+        default: 'Not Processed',
+        enum: ['Not Processed', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
     },
     transaction_id: {
         type: String,
@@ -57,21 +60,30 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     history: {
-        type: [{
-            status: {
-                type: String,
-                required: true
-            },
-            note: {
-                type: String,
-                required: true
-            },
-            process_time: {
-                type: Date,
-                default: Date.now
+        type: [
+            {
+                status: {
+                    type: String,
+                    default: 'Not Processed',
+                    enum: ['Not Processed', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
+                },
+                note: {
+                    type: String
+                },
+                process_time: {
+                    type: Date,
+                    default: Date.now
+                },
+                _id : false
             }
-        }],
-        default: []
+        ],
+        default: [
+            {
+                status: 'Not Processed',
+                note: 'Order created',
+                process_time: Date.now()
+            }
+        ]
     },
     order_address: {
         type: String,
@@ -83,4 +95,4 @@ const oOrderSchema = new oMongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = oMongoose.model("Order", oOrderSchema);
+module.exports = oMongoose.model('Order', oOrderSchema);
