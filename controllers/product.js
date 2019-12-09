@@ -27,8 +27,10 @@ this.setRequestBodyImage = oRequest => {
  * this function registers products in DB
  */
 exports.registerProduct = (oRequest, oResponse) => {
+  if (typeof oRequest.body.additional_info !== 'undefined') {
+    oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
+  }
   oRequest = this.setRequestBodyImage(oRequest);
-  oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
   const oProduct = new oProductModel(oRequest.body);
   oProduct.save((oError, oData) => {
     if (oError) {
