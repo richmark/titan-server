@@ -91,7 +91,7 @@ exports.productById = (oRequest, oResponse, oNext, sId) => {
  * gets a product with a particular product id
  */
 exports.getProductById = (oRequest, oResponse) => {
-  return oResponse.json(oRequest.product);
+  return oResponse.json({ data: oRequest.product });
 };
 
 /**
@@ -182,22 +182,23 @@ exports.listCategories = (oRequest, oResponse) => {
  * updates products
  */
 exports.updateProduct = (oRequest, oResponse) => {
-  const oProduct = oRequest.product;
-  oProduct.product_name = oRequest.body.product_name;
-  oProduct.price = oRequest.body.price;
-  oProduct.stock = oRequest.body.stock;
-  oProduct.description = oRequest.body.description;
-  oProduct.image_url = oRequest.body.image_url;
-  oProduct.sold = oRequest.body.sold;
-
-  oProduct.save((oError, oData) => {
-    if (oError) {
-      return oResponse.status(400).json({
-        error: errorHandler(oError)
-      });
+  if (typeof oRequest.body.additional_info !== 'undefined') {
+    oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
+  }
+  oRequest = this.setRequestBodyImage(oRequest);
+  oProductModel.findOneAndUpdate(
+    { _id: oRequest.product._id },
+    { $set: oRequest.body },
+    { new: true },
+    (oError, oData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: errorHandler(oError)
+        });
+      }
+      oResponse.json({data: oData});
     }
-    oResponse.json(oData);
-  });
+  );
 };
 
 /**
