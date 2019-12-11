@@ -27,7 +27,7 @@ this.setRequestBodyImage = oRequest => {
  * this function registers products in DB
  */
 exports.registerProduct = (oRequest, oResponse) => {
-  if (typeof oRequest.body.additional_info !== 'undefined') {
+  if (typeof oRequest.body.additional_info !== "undefined") {
     oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
   }
   oRequest = this.setRequestBodyImage(oRequest);
@@ -68,6 +68,22 @@ exports.listProducts = (oRequest, oResponse) => {
       }
       oResponse.json({ data: oData });
     });
+};
+
+/**
+ * countProduct function
+ * this function gets the count of all products inserted
+ */
+exports.countProducts = (oRequest, oResponse) => {
+  oProductModel.countDocuments().exec((oError, iCount) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: "Something went wrong!"
+      });
+    }
+
+    oResponse.json({ count: iCount });
+  });
 };
 
 /**
@@ -182,7 +198,7 @@ exports.listCategories = (oRequest, oResponse) => {
  * updates products
  */
 exports.updateProduct = (oRequest, oResponse) => {
-  if (typeof oRequest.body.additional_info !== 'undefined') {
+  if (typeof oRequest.body.additional_info !== "undefined") {
     oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
   }
   oRequest = this.setRequestBodyImage(oRequest);
@@ -196,7 +212,7 @@ exports.updateProduct = (oRequest, oResponse) => {
           error: errorHandler(oError)
         });
       }
-      oResponse.json({data: oData});
+      oResponse.json({ data: oData });
     }
   );
 };

@@ -11,7 +11,8 @@ const {
   listRelated,
   listCategories,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  countProducts
 } = require("../controllers/product");
 const { userById } = require("../controllers/user");
 const { uploadImage } = require("../middlewares/handleProductImage");
@@ -43,6 +44,7 @@ oRouter.delete(
 ); // ONGOING
 
 oRouter.get("/products", listProducts);
+oRouter.get("/products/count", countProducts);
 oRouter.get("/product/:productId", getProductById);
 oRouter.post("/products/by/search", listBySearch);
 oRouter.get("/products/related/:productId", listRelated);
