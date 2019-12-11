@@ -30,6 +30,7 @@ oRouter.put(
   requireSignin,
   checkAuth,
   checkAdmin,
+  uploadImage,
   updateProduct
 );
 
