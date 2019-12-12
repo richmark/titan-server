@@ -14,7 +14,6 @@ const oStorage = oMulter.diskStorage({
         oCallback(null, 'public/images/users');
     },
     filename: (oRequest, oFile, oCallback) => {
-        console.log(oFile);
         const sExtension = oFile.mimetype.split('/')[1];
         const sId = `user-${oRequest.profile._id}-${oFile.fieldname}.${sExtension}`;
         oCallback(null, sId);
