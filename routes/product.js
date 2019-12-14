@@ -12,9 +12,11 @@ const {
   listCategories,
   updateProduct,
   deleteProduct,
-  countProducts
+  countProducts,
+  listByCategory
 } = require("../controllers/product");
 const { userById } = require("../controllers/user");
+const { categoryById } = require("../controllers/category");
 const { uploadImage } = require("../middlewares/handleProductImage");
 
 oRouter.post(
@@ -49,8 +51,10 @@ oRouter.get("/product/:productId", getProductById);
 oRouter.post("/products/by/search", listBySearch);
 oRouter.get("/products/related/:productId", listRelated);
 oRouter.get("/products/categories", listCategories);
+oRouter.get("/products/category/:categoryId", listByCategory);
 
 oRouter.param("userId", userById);
 oRouter.param("productId", productById);
+oRouter.param("categoryId", categoryById);
 
 module.exports = oRouter;
