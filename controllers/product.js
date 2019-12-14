@@ -82,7 +82,7 @@ exports.countProducts = (oRequest, oResponse) => {
       });
     }
 
-    oResponse.json({ count: iCount });
+    oResponse.json({ data : { count: iCount }});
   });
 };
 
@@ -141,15 +141,17 @@ exports.listBySearch = (oRequest, oResponse) => {
     .sort([[sortBy, order]])
     .skip(skip)
     .limit(limit)
-    .exec((err, data) => {
+    .exec((err, oProduct) => {
       if (err) {
         return oResponse.status(400).json({
           error: "Products not found"
         });
       }
       oResponse.json({
-        size: data.length,
-        data
+        data: {
+          size: oProduct.length,
+          oProduct
+        }
       });
     });
 };
@@ -174,7 +176,7 @@ exports.listRelated = (oRequest, oResponse) => {
           error: "Products not found"
         });
       }
-      oResponse.json(oProduct);
+      oResponse.json({ data: oProduct });
     });
 };
 
@@ -189,7 +191,7 @@ exports.listCategories = (oRequest, oResponse) => {
         error: "Categories not found"
       });
     }
-    oResponse.json(oCategories);
+    oResponse.json({ data: oCategories });
   });
 };
 
@@ -234,3 +236,26 @@ exports.deleteProduct = (oRequest, oResponse) => {
     });
   });
 };
+
+exports.listByCategory = (oRequest, oResponse) => {
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  let sOrder = oRequest.query.order ? oRequest.query.order : 'desc';
+  let skip = parseInt(oRequest.query.skip);
+
+  oProductModel
+    .find({
+      category: oRequest.category._id
+    })
+    .limit(iLimit)
+    .populate("category", "_id name")
+    .sort([['_id', sOrder]])
+    .skip(skip)
+    .exec((oError, data) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      oResponse.json({ size: data.length, data });
+    });
+}
