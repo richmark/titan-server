@@ -40,7 +40,7 @@ exports.createCategory = (oRequest, oResponse) => {
  * Gets category by ID
  */
 exports.getCategory = (oRequest, oResponse) => {
-  return oResponse.json(oRequest.category);
+  return oResponse.json({ data: oRequest.category });
 };
 
 /**
@@ -82,16 +82,20 @@ exports.deleteCategory = (oRequest, oResponse) => {
  * updated category
  */
 exports.updateCategory = (oRequest, oResponse) => {
-  const oCategory = oRequest.category;
-  oCategory.name = oRequest.body.name;
-  oCategory.save((oError, oData) => {
-    if (oError) {
-      return oResponse.status(400).json({
-        error: errorHandler(oError)
-      });
+  oRequest = this.setRequestBodyImage(oRequest);
+  oCategoryModel.findOneAndUpdate(
+    { _id: oRequest.category._id},
+    { $set: oRequest.body },
+    { new: true},
+    (oError, oData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: errorHandler(oError)
+        });
+      }
+      oResponse.json({data: oData});
     }
-    oResponse.json(oData);
-  });
+  );
 };
 
 /**
