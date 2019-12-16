@@ -24,3 +24,57 @@ exports.createShipper = (oRequest, oResponse) => {
     oResponse.json({ data: oData });
   });
 };
+
+exports.listShippers = (oRequest, oResponse) => {
+  let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
+  let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
+
+  oShipperModel
+    .find()
+    .select()
+    .sort([[sSortBy, sOrder]])
+    .limit(iLimit)
+    .skip(iOffset)
+    .exec((oError, oData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: errorHandler(oError)
+        });
+      }
+      oResponse.json({ data: oData });
+    });
+};
+
+exports.shipperById = (oRequest, oResponse, oNext, sId) => {
+  oShipperModel.findById(sId).exec((oError, oShipper) => {
+    if (oError || !oShipper) {
+      oResponse.status(400).json({
+        error: "Shipper not found"
+      });
+    }
+    oRequest.shipper = oShipper;
+    oNext();
+  });
+};
+
+exports.getShipperById = (oRequest, oResponse) => {
+  return oResponse.json({ data: oRequest.shipper });
+}
+
+exports.updateShipper = (oRequest, oResponse) => {
+  oShipperModel.findOneAndUpdate(
+    { _id: oRequest.shipper._id },
+    { $set: oRequest.body },
+    { new: true },
+    (oError, oData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: errorHandler(oError)
+        });
+      }
+      oResponse.json({ data: oData });
+    }
+  );
+}
