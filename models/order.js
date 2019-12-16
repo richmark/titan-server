@@ -38,9 +38,8 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     shipper: {
-        type: ObjectId,
-        ref: 'Shipper',
-        required: true
+        type: String,
+        default: 'Basic Shipper'
     },
     status: {
         type: String,
@@ -90,7 +89,10 @@ const oOrderSchema = new oMongoose.Schema(
         trim: true,
         required: true,
         maxLength: 255
-    }
+    },
+    shipping_fee: {
+        type: Number
+    }, 
   },
   { timestamps: true }
 );
