@@ -89,7 +89,10 @@ const oOrderSchema = new oMongoose.Schema(
         trim: true,
         required: true,
         maxLength: 255
-    }
+    },
+    shipping_fee: {
+        type: Number
+    }, 
   },
   { timestamps: true }
 );
