@@ -25,6 +25,9 @@ exports.createShipper = (oRequest, oResponse) => {
   });
 };
 
+/**
+ * List Shippers
+ */
 exports.listShippers = (oRequest, oResponse) => {
   let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
   let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
@@ -47,6 +50,9 @@ exports.listShippers = (oRequest, oResponse) => {
     });
 };
 
+/**
+ * Find Shipper By Id
+ */
 exports.shipperById = (oRequest, oResponse, oNext, sId) => {
   oShipperModel.findById(sId).exec((oError, oShipper) => {
     if (oError || !oShipper) {
@@ -59,10 +65,17 @@ exports.shipperById = (oRequest, oResponse, oNext, sId) => {
   });
 };
 
+/**
+ * Get Shipper By Id
+ * Basically returns found shipper in shipperById
+ */
 exports.getShipperById = (oRequest, oResponse) => {
   return oResponse.json({ data: oRequest.shipper });
 }
 
+/**
+ * Update Shipper
+ */
 exports.updateShipper = (oRequest, oResponse) => {
   oShipperModel.findOneAndUpdate(
     { _id: oRequest.shipper._id },
