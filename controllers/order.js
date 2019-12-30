@@ -53,7 +53,7 @@ exports.listOrders = (oRequest, oResponse) => {
 exports.orderById = (oRequest, oResponse, oNext, sId) => {
     oOrderModel
     .findById(sId)
-    .populate('shipper')
+    .select()
     .exec((oError, oOrder) => {
         if (oError || !oOrder) {
             oResponse.status(400).json({
@@ -90,6 +90,28 @@ exports.getOrderById = (oRequest, oResponse) => {
         oOrder.products = _.merge(oOrder.products, oClonedData);
         oResponse.json({ data: oOrder });
     });
+}
+
+/**
+ * Get Order By User
+ * Load Orders per User
+ */
+exports.getOrderByUser = (oRequest, oResponse) => {
+    oOrderModel
+    .find({
+        'user': oRequest.profile._id
+    })
+    .select()
+    .exec((oError, oData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: "No Orders for User"
+            });
+        }
+        oResponse.json({
+            data: oData
+        });
+    })
 }
 
 /**
