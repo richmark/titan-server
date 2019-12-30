@@ -11,10 +11,11 @@ const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
-const { createOrder, listOrders, orderById, getOrderById, updateOrderById } = require("../controllers/order");
+const { createOrder, listOrders, orderById, getOrderById, updateOrderById, getOrderByUser } = require("../controllers/order");
 
-oRouter.get("/orders/:userId", requireSignin, checkAuth, checkAdmin, listOrders);
-oRouter.get("/orders/:userId/:orderId", requireSignin, checkAuth, checkAdmin, getOrderById);
+oRouter.get("/orders/:userId", requireSignin, checkAuth, listOrders);
+oRouter.get("/orders/lists/:userId", requireSignin, checkAuth, getOrderByUser);
+oRouter.get("/orders/:userId/:orderId", requireSignin, checkAuth, getOrderById);
 oRouter.put("/orders/:userId/:orderId", requireSignin, checkAuth, checkAdmin, updateOrderById);
 oRouter.post("/order/create/:userId", requireSignin, checkAuth, createOrder);
 
