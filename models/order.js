@@ -23,6 +23,11 @@ const oOrderedProductSchema = new oMongoose.Schema(
         count: {
             type: Number,
             required: true
+        },
+        reviewed: {
+            type: Boolean,
+            default: false,
+            required: true
         }
     },
     { _id : false }

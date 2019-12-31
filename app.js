@@ -25,6 +25,7 @@ const oCategoryRoutes = require("./routes/category");
 const oProductRoutes = require("./routes/product");
 const oShipperRoutes = require("./routes/shipper");
 const oOrderRoutes = require("./routes/order");
+const oReviewRoutes = require("./routes/review");
 const oBrainTreeRoutes = require("./routes/braintree");
 
 /**
@@ -64,6 +65,7 @@ oApp.use("/api/v1", oProductRoutes);
 oApp.use("/api/v1", oShipperRoutes);
 oApp.use("/api/v1", oOrderRoutes);
 oApp.use("/api/v1", oBrainTreeRoutes);
+oApp.use("/api/v1", oReviewRoutes);
 
 /**
  * Default port 8000
