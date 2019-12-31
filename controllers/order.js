@@ -12,8 +12,8 @@ const { errorHandler } = require("../helpers/dbErrorHandler");
 const { _ } = require('lodash');
 
 /**
- * createShipper function
- * this function create shipper
+ * createOrder function
+ * this function create order
  */
 exports.createOrder = (oRequest, oResponse) => {
     const oOrder = new oOrderModel(oRequest.body);
@@ -50,6 +50,10 @@ exports.listOrders = (oRequest, oResponse) => {
         });
 };
 
+/**
+ * orderById middleware
+ * checks if order exists by id
+ */
 exports.orderById = (oRequest, oResponse, oNext, sId) => {
     oOrderModel
     .findById(sId)
@@ -120,7 +124,7 @@ exports.getOrderByUser = (oRequest, oResponse) => {
  */
 exports.updateOrderById = (oRequest, oResponse) => {
     let oQuery = this.setQuery(oRequest.body, oRequest.order.status);
-    console.log(oQuery);
+    
     oOrderModel.findOneAndUpdate(
         { _id: oRequest.order._id},
         oQuery,
