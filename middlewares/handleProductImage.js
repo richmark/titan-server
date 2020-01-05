@@ -12,22 +12,17 @@ const oUuidv1 = require("uuid/v1");
 this.setFileName = (oRequest, oFile, oCallback) => {
   const sExtension = oFile.mimetype.split("/")[1];
   let sId = '';
-  if (oRequest.product === undefined) {
-    sId = `product-${oRequest.profile._id}-${Date.now() + oRequest.iIndex}-${oFile.fieldname}.${sExtension}`;
-    oRequest.iIndex++;
-  } else {
-    if (oFile.fieldname === 'image') {
-      sId = oRequest.product.image;
-    }
+  if (oRequest.method === 'PUT' && oRequest.product !== undefined) {
+    sId = oRequest.product.image;
     if (oFile.fieldname === 'additional_images') {
-      console.log(oRequest.iIndex);
-      sId = oRequest.product.additional_images[oRequest.iIndex];
-      if (sId === undefined) {
-        sId = `product-${oRequest.profile._id}-${Date.now()}-${oFile.fieldname}.${sExtension}`;
-      }
+      sTemp = oRequest.product.additional_images[oRequest.iIndex];
+      sId = sTemp === undefined ? `product-${oRequest.profile._id}-${Date.now()}-${oFile.fieldname}.${sExtension}` : sTemp;
       oRequest.iIndex++;
     }
+    return oCallback(null, sId);
   }
+  sId = `product-${oRequest.profile._id}-${Date.now() + oRequest.iIndex}-${oFile.fieldname}.${sExtension}`;
+  oRequest.iIndex++;
   oCallback(null, sId);
 };
 
