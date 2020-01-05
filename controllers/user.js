@@ -21,6 +21,7 @@ exports.userById = (oRequest, oResponse, oNext, sId) => {
       });
     }
     oRequest.profile = oUserData;
+    oRequest.iIndex = 0;
     oNext();
   });
 };

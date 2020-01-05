@@ -9,15 +9,27 @@
 const oProductModel = require("../models/product");
 const oFormidable = require("formidable");
 const { errorHandler } = require("../helpers/dbErrorHandler");
+const _ = require('lodash');
+const oFileSystem = require('fs');
 
 /**
  * sets product image
  */
 this.setRequestBodyImage = oRequest => {
   if (typeof oRequest.files !== "undefined") {
+    var aAdditionalImages = [];
     Object.keys(oRequest.files).forEach(sKey => {
-      oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+      if (sKey === 'additional_images') {
+        for(var iIndex in oRequest.files[sKey]) {
+          aAdditionalImages.push(oRequest.files[sKey][iIndex].filename);
+        }
+      } else {
+        oRequest.body[sKey] = oRequest.files[sKey][0].filename;
+      }
     });
+    if (aAdditionalImages.length > 0) {
+      oRequest.body['additional_images'] = aAdditionalImages;
+    }
   }
   return oRequest;
 };
@@ -214,10 +226,30 @@ exports.updateProduct = (oRequest, oResponse) => {
           error: errorHandler(oError)
         });
       }
+      var aError = this.deleteUnusedImage(oRequest);
+      if (aError.length > 0) {
+        return oResponse.status(400).json({ error: 'Error in deleting images' }); // refactor, delete first before updating
+      }
       oResponse.json({ data: oData });
     }
   );
 };
+
+this.deleteUnusedImage = (oRequest) => {
+  if (oRequest.body.additional_images && oRequest.body.additional_images.length < oRequest.product.additional_images.length) {
+    const aDeleteImages = _.difference(oRequest.product.additional_images, oRequest.body.additional_images);
+    const aError = [];
+    aDeleteImages.forEach(sFile => {
+      oFileSystem.unlink(`public/images/products/${sFile}`, oError => {
+        if (oError) {
+          aError.push(oError.message);
+        }
+      });
+    });
+    return aError;
+  }
+  return [];
+}
 
 /**
  * deleteProduct function

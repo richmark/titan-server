@@ -52,6 +52,7 @@ oApp.use(oCors());
 /**
  * Middlewares
  */
+oApp.use(oBodyParser.urlencoded( { extended: true} ));
 oApp.use(oBodyParser.json());
 oApp.use(oExpress.static(oPath.resolve("./public")));
 

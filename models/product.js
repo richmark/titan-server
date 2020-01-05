@@ -33,6 +33,9 @@ const oProductSchema = new oMongoose.Schema(
       required: true,
       maxLength: 100
     },
+    additional_images: {
+      type: [String]
+    },
     sold: {
       type: Number,
       default: 0
