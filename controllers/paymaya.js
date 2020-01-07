@@ -1,4 +1,6 @@
 const oUserModel = require('../models/user');
+const oPaymayaModel = require('../models/paymaya');
+const oUuidv1 = require("uuid/v1");
 const oSdk = require('paymaya-node-sdk');
 const oPaymaya = oSdk.PaymayaSDK;
 const oCheckout = oSdk.Checkout;
@@ -8,7 +10,7 @@ const oBuyer = oSdk.Buyer;
 const oItemAmountDetails = oSdk.ItemAmountDetails;
 const oItemAmount = oSdk.ItemAmount;
 const oItem = oSdk.Item;
-const YOUR_REQUEST_REFERENCE_NUMBER = "123456789";
+const sRequestId = oUuidv1();
 require('dotenv').config();
 
 oPaymaya.initCheckout(
@@ -114,18 +116,55 @@ exports.initiateCheckout = (oReq, oRes) => {
     
     checkout.buyer = buyer;
     checkout.totalAmount = itemOptions.totalAmount;
-    checkout.requestReferenceNumber = YOUR_REQUEST_REFERENCE_NUMBER;
+    checkout.requestReferenceNumber = sRequestId;
     checkout.items = items;
+    var oData = {
+        "success": `http://localhost:8000/api/v1/paymaya/retrieveCheckout/${oReq.profile._id}?sRequestId=${sRequestId}`,
+        "failure": "https://www.facebook.com",
+        "cancel" : "https://www.yahoo.com"
+    }
+    checkout.redirectUrl = oData;
     console.log(JSON.stringify(checkout));
     checkout.execute(function (error, response) {
         if (error) {
             oRes.status(500).json(error);
         } else {
-            return oRes.json({
-                data: response,
-                state: checkout
-            }); 
+            const oModel = {
+                'referenceId' : sRequestId,
+                'checkoutId'  : response.checkoutId,
+                'userId'      : oReq.profile._id
+            };
+            const oCreate = new oPaymayaModel(oModel);
+            oCreate.save((oError, oData) => {
+                if (oError) {
+                    return oResponse.status(400).json({
+                        error: errorHandler(oError)
+                    });
+                }
+                return oRes.json({
+                    data: response,
+                    state: checkout
+                });
+            });
+            
         }
     });
 
 }
+
+exports.retrieveCheckout = (oReq, oRes) => {
+    const oBody = {
+        'referenceId' : oReq.query.sRequestId,
+        'userId'      : oReq.profile._id
+    };
+    oPaymayaModel.find(oBody).exec((oError, oData) => {
+        if (oError || !oData) {
+            return oResponse.status(400).json({
+              error: "Transaction not found"
+            });
+        }
+        return oRes.json({
+            data : oData
+        });
+    });
+};

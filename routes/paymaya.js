@@ -2,9 +2,10 @@ const oExpress = require('express');
 const oRouter = oExpress.Router();
 const { requireSignin, checkAuth } = require('../controllers/auth');
 const { userById } = require('../controllers/user');
-const { initiateCheckout } = require('../controllers/paymaya');
+const { initiateCheckout, retrieveCheckout } = require('../controllers/paymaya');
 
-oRouter.get('/paymaya/initiateCheckout', initiateCheckout);
+oRouter.post('/paymaya/initiateCheckout/:userId', initiateCheckout);
+oRouter.get('/paymaya/retrieveCheckout/:userId', retrieveCheckout);
 
 oRouter.param('userId', userById);
 
