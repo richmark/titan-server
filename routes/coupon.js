@@ -15,7 +15,9 @@ const {
   createCoupon,
   couponById,
   getCoupon,
-  listCoupon
+  listCoupon,
+  updateCoupon,
+  deleteCoupon
 } = require("../controllers/coupon");
 
 oRouter.post(
@@ -24,6 +26,22 @@ oRouter.post(
   checkAuth,
   checkAdmin,
   createCoupon
+);
+
+oRouter.put(
+  "/coupon/:couponId/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  updateCoupon
+);
+
+oRouter.delete(
+  "/coupon/:couponId/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  deleteCoupon
 );
 
 oRouter.get("/coupon/:couponId", getCoupon);

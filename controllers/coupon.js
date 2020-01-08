@@ -74,3 +74,41 @@ exports.listCoupon = (oRequest, oResponse) => {
       oResponse.json({ data: oData });
     });
 };
+
+/**
+ * update coupon function
+ * updates coupon
+ */
+exports.updateCoupon = (oRequest, oResponse) => {
+  oCouponModel.findOneAndUpdate(
+    { _id: oRequest.coupon._id },
+    { $set: oRequest.body },
+    { new: true },
+    (oError, oData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: errorHandler(oError)
+        });
+      }
+      oResponse.json({ data: oData });
+    }
+  );
+};
+
+/**
+ * deleteCoupon function
+ * deletes coupon
+ */
+exports.deleteCoupon = (oRequest, oResponse) => {
+  const oCoupon = oRequest.coupon;
+  oCoupon.remove(oError => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: errorHandler(oError)
+      });
+    }
+    oResponse.json({
+      message: "Coupon deleted!"
+    });
+  });
+};
