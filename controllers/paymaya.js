@@ -21,26 +21,28 @@ oPaymaya.initCheckout(
 
 
 exports.initiateCheckout = (oReq, oRes) => {
+    console.log(oReq.body);
+    const oCustomer = oReq.body.customer;
     var checkout = new oCheckout();
 
     var addressOptions = {
-        line1 : "9F Robinsons Cybergate 3",
-        line2 : "Pioneer Street",
-        city : "Mandaluyong City",
-        state : "Metro Manila",
-        zipCode : "12345",
+        line1 : oReq.body.order_address,
+        line2 : "",
+        city : "",
+        state : "",
+        zipCode : "",
         countryCode : "PH"
     };
   
     var contactOptions = {
-        phone : "+63(2)1234567890",
-        email : "paymayabuyer1@gmail.com"
+        phone : oCustomer.mobile_number,
+        email : oCustomer.email
     };
     
     var buyerOptions = {
-        firstName : "John",
-        middleName : "Michaels",
-        lastName : "Doe"
+        firstName : oCustomer.first_name,
+        middleName : "",
+        lastName : oCustomer.last_name
     };
         
     var contact = new oContact();
@@ -83,8 +85,11 @@ exports.initiateCheckout = (oReq, oRes) => {
     
     var itemOptions = {
         name: "Leather Belt",
+        quantity: "32",
         code: "pm_belt",
-        description: "Medium-sv"
+        description: "Medium-sv",
+        amount: "32",
+        totalAmount: "100"
     };
     
     var itemAmountDetails = new oItemAmountDetails();
@@ -97,7 +102,11 @@ exports.initiateCheckout = (oReq, oRes) => {
     itemAmount.currency = itemAmountOptions.currency;
     itemAmount.value = itemAmountOptions.value;
     itemAmount.details = itemAmountOptions.details;
-    itemOptions.amount = itemAmount;
+    console.log(itemAmount, '<----CHECK');
+    itemOptions.amount = {
+        currency: "PHP",
+        value : "100000"
+    };
     itemOptions.totalAmount = itemAmount;
     
     /**
@@ -107,6 +116,7 @@ exports.initiateCheckout = (oReq, oRes) => {
     item.name = itemOptions.name;
     item.code = itemOptions.code;
     item.description = itemOptions.description;
+    item.quantity = itemOptions.quantity;
     item.amount = itemOptions.amount;
     item.totalAmount = itemOptions.totalAmount;
     
@@ -124,7 +134,7 @@ exports.initiateCheckout = (oReq, oRes) => {
         "cancel" : "https://www.yahoo.com"
     }
     checkout.redirectUrl = oData;
-    console.log(JSON.stringify(checkout));
+    console.log(checkout);
     checkout.execute(function (error, response) {
         if (error) {
             oRes.status(500).json(error);
