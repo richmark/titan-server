@@ -25,6 +25,7 @@ const oCategoryRoutes = require("./routes/category");
 const oProductRoutes = require("./routes/product");
 const oShipperRoutes = require("./routes/shipper");
 const oOrderRoutes = require("./routes/order");
+const oCouponRoutes = require("./routes/coupon");
 const oReviewRoutes = require("./routes/review");
 const oBrainTreeRoutes = require("./routes/braintree");
 const oPaymayaRoutes = require("./routes/paymaya");
@@ -53,7 +54,7 @@ oApp.use(oCors());
 /**
  * Middlewares
  */
-oApp.use(oBodyParser.urlencoded( { extended: true} ));
+oApp.use(oBodyParser.urlencoded({ extended: true }));
 oApp.use(oBodyParser.json());
 oApp.use(oExpress.static(oPath.resolve("./public")));
 
@@ -69,6 +70,8 @@ oApp.use("/api/v1", oOrderRoutes);
 oApp.use("/api/v1", oBrainTreeRoutes);
 oApp.use("/api/v1", oReviewRoutes);
 oApp.use("/api/v1", oPaymayaRoutes);
+oApp.use("/api/v1", oCouponRoutes);
+
 /**
  * Default port 8000
  * Port status
