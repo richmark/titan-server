@@ -126,6 +126,7 @@ exports.retrieveCheckout = (oReq, oRes) => {
                     error: oErrorCheckout
                 });
             }
+            console.log(oResult);
             if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
                 return this.insertOrder(oReq, oRes, oResult);
             }
