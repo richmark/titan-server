@@ -5,7 +5,6 @@ const oUuidv1 = require("uuid/v1");
 const oSdk = require('paymaya-node-sdk');
 const oPaymaya = oSdk.PaymayaSDK;
 const oCheckout = oSdk.Checkout;
-const sRequestId = oUuidv1();
 require('dotenv').config();
 
 oPaymaya.initCheckout(
@@ -16,7 +15,7 @@ oPaymaya.initCheckout(
 
 
 exports.initiateCheckout = (oReq, oRes) => {
-    console.log(oReq.body);
+    const sRequestId = oUuidv1();
     const oCustomer = oReq.body.customer;
     var checkout = new oCheckout();
 
@@ -76,9 +75,9 @@ exports.initiateCheckout = (oReq, oRes) => {
     });
     checkout.items = aItem;
     var oData = {
-        "success": `http://localhost:8000/api/v1/paymaya/retrieveCheckout/${oReq.profile._id}?sRequestId=${sRequestId}`,
-        "failure": "https://www.facebook.com",
-        "cancel" : "https://www.yahoo.com"
+        "success": `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/success`,
+        "failure": `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
+        "cancel" : `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
     }
     checkout.redirectUrl = oData;
     checkout.execute(function (error, response) {
@@ -126,7 +125,6 @@ exports.retrieveCheckout = (oReq, oRes) => {
                     error: oErrorCheckout
                 });
             }
-            console.log(oResult);
             if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
                 return this.insertOrder(oReq, oRes, oResult);
             }
