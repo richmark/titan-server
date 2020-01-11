@@ -28,6 +28,7 @@ const oOrderRoutes = require("./routes/order");
 const oCouponRoutes = require("./routes/coupon");
 const oReviewRoutes = require("./routes/review");
 const oBrainTreeRoutes = require("./routes/braintree");
+const oPaymayaRoutes = require("./routes/paymaya");
 
 /**
  * App Instance
@@ -68,6 +69,7 @@ oApp.use("/api/v1", oShipperRoutes);
 oApp.use("/api/v1", oOrderRoutes);
 oApp.use("/api/v1", oBrainTreeRoutes);
 oApp.use("/api/v1", oReviewRoutes);
+oApp.use("/api/v1", oPaymayaRoutes);
 oApp.use("/api/v1", oCouponRoutes);
 
 /**

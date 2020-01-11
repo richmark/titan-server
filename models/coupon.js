@@ -23,11 +23,20 @@ const oCouponSchema = new oMongoose.Schema(
       required: true,
       maxLength: 24
     },
+    description: {
+      type: String,
+      required: true,
+      maxLength: 100
+    },
     discount: {
       type: Number,
       required: true
     },
-    expiry_date: {
+    start_date: {
+      type: Date,
+      required: true
+    },
+    end_date: {
       type: Date,
       required: true
     },
