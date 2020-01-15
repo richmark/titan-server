@@ -3,6 +3,7 @@ const oPaymayaModel = require('../models/paymaya');
 const oOrderModel = require('../models/order');
 const oUuidv1 = require("uuid/v1");
 const oSdk = require('paymaya-node-sdk');
+const { FRONT_DOMAIN } = require("../config");
 const oPaymaya = oSdk.PaymayaSDK;
 const oCheckout = oSdk.Checkout;
 require('dotenv').config();
@@ -75,9 +76,9 @@ exports.initiateCheckout = (oReq, oRes) => {
     });
     checkout.items = aItem;
     var oData = {
-        "success": `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/success`,
-        "failure": `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
-        "cancel" : `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
+        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success`,
+        "failure": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
+        "cancel" : `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
     }
     checkout.redirectUrl = oData;
     checkout.execute(function (error, response) {
