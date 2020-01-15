@@ -99,6 +99,9 @@ const oOrderSchema = new oMongoose.Schema(
     },
     shipping_fee: {
         type: Number
+    },
+    reference_number: {
+        type: String,
     }, 
   },
   { timestamps: true }

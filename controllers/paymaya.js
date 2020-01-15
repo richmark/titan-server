@@ -117,25 +117,41 @@ exports.retrieveCheckout = (oReq, oRes) => {
               error: "Transaction not found"
             });
         }
-        var checkout = new oCheckout();
-        checkout.id = aData[0].checkoutId;
-        checkout.retrieve((oErrorCheckout, oResult) => {
-            if (oErrorCheckout) {
-                return oRes.status(400).json({
-                    error: oErrorCheckout
-                });
-            }
-            if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
-                return this.insertOrder(oReq, oRes, oResult);
-            }
-            
-            return oRes.status(400).json({
-                error: 'payment_failed'
-            });
-        });
-        
+        return this.checkTransactionOrder(aData[0], oReq, oRes);
     });
 };
+
+this.retrieveDetails = (oData, oReq, oRes) => {
+    var checkout = new oCheckout();
+    checkout.id = oData.checkoutId;
+    checkout.retrieve((oErrorCheckout, oResult) => {
+        if (oErrorCheckout) {
+            return oRes.status(400).json({
+                error: oErrorCheckout
+            });
+        }
+        if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
+            return this.insertOrder(oReq, oRes, oResult);
+        }
+        
+        return oRes.status(400).json({
+            error: 'payment_failed'
+        });
+    });
+}
+
+this.checkTransactionOrder = (oData, oRequest, oResponse) => {
+    const oBody = {
+        reference_number: oData.referenceId,
+        user            : oData.userId 
+    }
+    oOrderModel.find(oBody).exec((oError, aData) => {
+        if (oError || aData.length === 0) {
+            return this.retrieveDetails(oData, oRequest, oResponse);
+        }
+        return oResponse.json({ data: aData[0] });
+    });
+}
 
 this.insertOrder = (oReq, oRes, oResult) => {
     var aItems = oResult.items;
@@ -145,6 +161,7 @@ this.insertOrder = (oReq, oRes, oResult) => {
         transaction_id: oResult.paymentDetails.responses.efs.receipt.transactionId,
         amount: oResult.totalAmount.amount,
         shipping_fee: oResult.totalAmount.details.shippingFee,
+        reference_number: oResult.requestReferenceNumber,
         products: []
     }
     aItems.map((oItem, iIndex) => {
