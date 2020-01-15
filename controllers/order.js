@@ -60,7 +60,7 @@ exports.orderById = (oRequest, oResponse, oNext, sId) => {
     .select()
     .exec((oError, oOrder) => {
         if (oError || !oOrder) {
-            oResponse.status(400).json({
+            return oResponse.status(400).json({
                 error: "Order not found"
             });
         }
@@ -129,7 +129,6 @@ exports.updateOrderById = (oRequest, oResponse) => {
         { _id: oRequest.order._id},
         oQuery,
         (oError, oData) => {
-            console.log(oError);
             if (oError) {
                 return oResponse.status(400).json({
                 error: errorHandler(oError)

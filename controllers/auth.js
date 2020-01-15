@@ -119,9 +119,6 @@ exports.checkAuth = (oRequest, oResponse, oNext) => {
     oRequest.profile &&
     oRequest.auth &&
     oRequest.profile._id == oRequest.auth._id;
-
-  console.log(oRequest);
-
   if (!oUser) {
     return oResponse.status(403).json({
       error: "Access Denied!"

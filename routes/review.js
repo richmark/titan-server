@@ -21,14 +21,14 @@ const {
 } = require("../controllers/review");
 
 oRouter.post(
-  "/review/create/:userId/:productId/:orderId",
+  '/review/create/:userId/:productId/:orderId',
   requireSignin,
   checkAuth,
   checkReview
 );
 
 oRouter.put(
-  "/review/:reviewId/:userId",
+  '/review/:reviewId/:userId',
   requireSignin,
   checkAuth,
   checkAdmin,
