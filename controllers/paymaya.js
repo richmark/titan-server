@@ -76,7 +76,7 @@ exports.initiateCheckout = (oReq, oRes) => {
     });
     checkout.items = aItem;
     var oData = {
-        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success`,
+        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success?bData=${oReq.body.bBuyNow}`,
         "failure": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
         "cancel" : `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
     }
