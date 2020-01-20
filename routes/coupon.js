@@ -14,6 +14,7 @@ const { userById } = require("../controllers/user");
 const {
   createCoupon,
   couponById,
+  couponByCode,
   getCoupon,
   listCoupon,
   updateCoupon,
@@ -44,10 +45,12 @@ oRouter.delete(
   deleteCoupon
 );
 
+oRouter.get("/coupon/code/:couponCode", getCoupon);
 oRouter.get("/coupon/:couponId", getCoupon);
 oRouter.get("/coupon", listCoupon);
 
 oRouter.param("userId", userById);
 oRouter.param("couponId", couponById);
+oRouter.param("couponCode", couponByCode);
 
 module.exports = oRouter;

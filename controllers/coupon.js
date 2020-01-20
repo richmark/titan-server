@@ -42,6 +42,22 @@ exports.couponById = (oRequest, oResponse, oNext, sId) => {
 };
 
 /**
+ * Coupon by Code middleware
+ * This middle gets coupon by code
+ */
+exports.couponByCode = (oRequest, oResponse, oNext, sCode) => {
+  oCouponModel.find({ coupon_code: sCode }).exec((oError, oCoupon) => {
+    if (oError || !oCoupon) {
+      return oResponse.status(400).json({
+        error: "Coupon does not exist!"
+      });
+    }
+    oRequest.coupon = oCoupon;
+    oNext();
+  });
+};
+
+/**
  * getCoupon function
  * this function gets coupon by ID
  */
