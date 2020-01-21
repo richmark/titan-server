@@ -26,8 +26,7 @@ const oOrderedProductSchema = new oMongoose.Schema(
         },
         reviewed: {
             type: Boolean,
-            default: false,
-            required: true
+            default: false
         }
     },
     { _id : false }
@@ -100,6 +99,9 @@ const oOrderSchema = new oMongoose.Schema(
     },
     shipping_fee: {
         type: Number
+    },
+    reference_number: {
+        type: String,
     }, 
   },
   { timestamps: true }
