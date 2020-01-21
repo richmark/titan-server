@@ -61,34 +61,15 @@ exports.userSignin = (oRequest, oResponse) => {
     const sToken = oJwt.sign({ _id: oUser._id }, process.env.JWT_SECRET);
     oResponse.cookie("t", sToken, { expire: new Date() + 9999 });
 
-    const {
-      _id,
-      first_name,
-      last_name,
-      email,
-      role,
-      mobile_number,
-      address,
-      verified_admin,
-      store_front,
-      company_bir,
-      mayor_permit
-    } = oUser;
+    oUser.hashed_password = undefined;
+    oUser.salt = undefined;
+    oUser.passwordResetToken = undefined;
+    oUser.passwordResetExpires = undefined;
+    oUser.passwordChangedAt = undefined;
+
     return oResponse.json({
       sToken,
-      user: {
-        _id,
-        first_name,
-        last_name,
-        email,
-        role,
-        mobile_number,
-        address,
-        verified_admin,
-        store_front,
-        company_bir,
-        mayor_permit
-      }
+      user: oUser
     });
   });
 };
