@@ -66,6 +66,22 @@ exports.getCoupon = (oRequest, oResponse) => {
 };
 
 /**
+ * countCoupon function
+ * this function gets the count of all products inserted
+ */
+exports.countCoupon = (oRequest, oResponse) => {
+  oCouponModel.countDocuments().exec((oError, iCount) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: "Something went wrong!"
+      });
+    }
+
+    oResponse.json({ data: { count: iCount } });
+  });
+};
+
+/**
  * List Coupon Function
  * This function lists coupon with search filters.
  */
