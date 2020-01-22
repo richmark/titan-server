@@ -3,6 +3,7 @@ const oPaymayaModel = require('../models/paymaya');
 const oOrderModel = require('../models/order');
 const oUuidv1 = require("uuid/v1");
 const oSdk = require('paymaya-node-sdk');
+const { FRONT_DOMAIN } = require("../config");
 const oPaymaya = oSdk.PaymayaSDK;
 const oCheckout = oSdk.Checkout;
 require('dotenv').config();
@@ -28,11 +29,11 @@ exports.initiateCheckout = (oReq, oRes) => {
           "email": oCustomer.email
         },
         "shippingAddress": {
-          "line1": oReq.body.order_address,
+          "line1": oReq.body.shipping_address,
           "countryCode": "PH"
         },
         "billingAddress": {
-          "line1": oReq.body.order_address,
+          "line1": oReq.body.billing_address,
           "countryCode": "PH"
         },
     };
@@ -75,9 +76,9 @@ exports.initiateCheckout = (oReq, oRes) => {
     });
     checkout.items = aItem;
     var oData = {
-        "success": `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/success`,
-        "failure": `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
-        "cancel" : `http://localhost:3000/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
+        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success?bData=${oReq.body.bBuyNow}&oBilling=${oReq.body.billing}&oShipping=${oReq.body.shipping}`,
+        "failure": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
+        "cancel" : `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
     }
     checkout.redirectUrl = oData;
     checkout.execute(function (error, response) {
@@ -117,34 +118,52 @@ exports.retrieveCheckout = (oReq, oRes) => {
               error: "Transaction not found"
             });
         }
-        var checkout = new oCheckout();
-        checkout.id = aData[0].checkoutId;
-        checkout.retrieve((oErrorCheckout, oResult) => {
-            if (oErrorCheckout) {
-                return oRes.status(400).json({
-                    error: oErrorCheckout
-                });
-            }
-            if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
-                return this.insertOrder(oReq, oRes, oResult);
-            }
-            
-            return oRes.status(400).json({
-                error: 'payment_failed'
-            });
-        });
-        
+        return this.checkTransactionOrder(aData[0], oReq, oRes);
     });
 };
+
+this.retrieveDetails = (oData, oReq, oRes) => {
+    var checkout = new oCheckout();
+    checkout.id = oData.checkoutId;
+    checkout.retrieve((oErrorCheckout, oResult) => {
+        if (oErrorCheckout) {
+            return oRes.status(400).json({
+                error: oErrorCheckout
+            });
+        }
+        if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
+            return this.insertOrder(oReq, oRes, oResult);
+        }
+        
+        return oRes.status(400).json({
+            error: 'payment_failed'
+        });
+    });
+}
+
+this.checkTransactionOrder = (oData, oRequest, oResponse) => {
+    const oBody = {
+        reference_number: oData.referenceId,
+        user            : oData.userId 
+    }
+    oOrderModel.find(oBody).exec((oError, aData) => {
+        if (oError || aData.length === 0) {
+            return this.retrieveDetails(oData, oRequest, oResponse);
+        }
+        return oResponse.json({ data: aData[0] });
+    });
+}
 
 this.insertOrder = (oReq, oRes, oResult) => {
     var aItems = oResult.items;
     var oOrder = {
         user: oReq.profile._id,
-        order_address: oResult.buyer.shippingAddress.line1,
+        billing: oReq.body.oBilling,
+        shipping: oReq.body.oShipping, 
         transaction_id: oResult.paymentDetails.responses.efs.receipt.transactionId,
         amount: oResult.totalAmount.amount,
         shipping_fee: oResult.totalAmount.details.shippingFee,
+        reference_number: oResult.requestReferenceNumber,
         products: []
     }
     aItems.map((oItem, iIndex) => {
@@ -163,7 +182,7 @@ this.createOrder = (oCreate , oResponse) => {
     oOrder.save((oError, oData) => {
         if (oError) {
             return oResponse.status(400).json({
-                error: errorHandler(oError)
+                error: oError
             });
         }
         return oResponse.json({ data: oData });

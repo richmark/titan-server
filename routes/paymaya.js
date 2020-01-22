@@ -5,7 +5,7 @@ const { userById } = require('../controllers/user');
 const { initiateCheckout, retrieveCheckout } = require('../controllers/paymaya');
 
 oRouter.post('/paymaya/initiateCheckout/:userId', initiateCheckout);
-oRouter.get('/paymaya/retrieveCheckout/:userId', retrieveCheckout);
+oRouter.post('/paymaya/retrieveCheckout/:userId', retrieveCheckout);
 
 oRouter.param('userId', userById);
 

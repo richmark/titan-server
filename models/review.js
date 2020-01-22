@@ -33,8 +33,7 @@ const oReviewSchema = new oMongoose.Schema(
         },
         visibility: {
             type: Boolean,
-            default: false,
-            required: true
+            default: false
         }
     },
     { timestamps: true }

@@ -1,6 +1,7 @@
 node_modules
 public/images/users/user-*
 public/images/categories/category-*
-public/images/products/*.jpeg
+public/images/products/product-*
+public/images/bundles/bundle-*
 .env
 package-lock.json
