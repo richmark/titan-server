@@ -32,6 +32,24 @@ const oOrderedProductSchema = new oMongoose.Schema(
     { _id : false }
 );
 
+const oOrderedDetailsSchema = new oMongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true
+        },
+        address: {
+            type: String,
+            required: true
+        },
+        contact: {
+            type: String,
+            default: false
+        }
+    },
+    { _id : false }
+);
+
 module.exports = oMongoose.model('OrderedProduct', oOrderedProductSchema);
 
 const oOrderSchema = new oMongoose.Schema(
@@ -91,11 +109,13 @@ const oOrderSchema = new oMongoose.Schema(
             }
         ]
     },
-    order_address: {
-        type: String,
-        trim: true,
-        required: true,
-        maxLength: 255
+    billing: {
+        type: [oOrderedDetailsSchema],
+        required: true
+    },
+    shipping: {
+        type: [oOrderedDetailsSchema],
+        required: true
     },
     shipping_fee: {
         type: Number
