@@ -23,6 +23,11 @@ const oCouponSchema = new oMongoose.Schema(
       maxLength: 24,
       unique: true
     },
+    coupon_type: {
+      type: String,
+      trim: true,
+      required: true
+    },
     description: {
       type: String,
       required: true,
