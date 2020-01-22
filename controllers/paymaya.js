@@ -29,11 +29,11 @@ exports.initiateCheckout = (oReq, oRes) => {
           "email": oCustomer.email
         },
         "shippingAddress": {
-          "line1": oReq.body.order_address,
+          "line1": oReq.body.shipping_address,
           "countryCode": "PH"
         },
         "billingAddress": {
-          "line1": oReq.body.order_address,
+          "line1": oReq.body.billing_address,
           "countryCode": "PH"
         },
     };
@@ -76,7 +76,7 @@ exports.initiateCheckout = (oReq, oRes) => {
     });
     checkout.items = aItem;
     var oData = {
-        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success?bData=${oReq.body.bBuyNow}`,
+        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success?bData=${oReq.body.bBuyNow}&oBilling=${oReq.body.billing}&oShipping=${oReq.body.shipping}`,
         "failure": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
         "cancel" : `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
     }
@@ -158,7 +158,8 @@ this.insertOrder = (oReq, oRes, oResult) => {
     var aItems = oResult.items;
     var oOrder = {
         user: oReq.profile._id,
-        order_address: oResult.buyer.shippingAddress.line1,
+        billing: oReq.body.oBilling,
+        shipping: oReq.body.oShipping, 
         transaction_id: oResult.paymentDetails.responses.efs.receipt.transactionId,
         amount: oResult.totalAmount.amount,
         shipping_fee: oResult.totalAmount.details.shippingFee,
@@ -181,7 +182,7 @@ this.createOrder = (oCreate , oResponse) => {
     oOrder.save((oError, oData) => {
         if (oError) {
             return oResponse.status(400).json({
-                error: errorHandler(oError)
+                error: oError
             });
         }
         return oResponse.json({ data: oData });
