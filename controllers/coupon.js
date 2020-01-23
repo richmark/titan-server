@@ -58,6 +58,39 @@ exports.couponByCode = (oRequest, oResponse, oNext, sCode) => {
 };
 
 /**
+ * Coupon Search
+ * This function searches through the coupon table
+ */
+exports.couponSearch = (oRequest, oResponse) => {
+  let queryString = oRequest.body.query;
+  oCouponModel
+    .find({
+      $or: [
+        {
+          coupon_name: { $regex: queryString }
+        },
+        {
+          coupon_code: { $regex: queryString }
+        },
+        {
+          description: { $regex: queryString }
+        },
+        {
+          coupon_type: { $regex: queryString }
+        }
+      ]
+    })
+    .exec((oError, oCoupon) => {
+      if (oError || !oCoupon) {
+        return oResponse.status(400).json({
+          error: "Coupon does not exist!"
+        });
+      }
+      oResponse.json({ data: oCoupon });
+    });
+};
+
+/**
  * getCoupon function
  * this function gets coupon by ID
  */
