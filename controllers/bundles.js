@@ -26,15 +26,15 @@ this.setRequestBodyImage = oRequest => {
 exports.createBundle = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);
   oRequest.body.products = JSON.parse(oRequest.body.products);
-  // const oBundle = new oBundleModel(oRequest.body);
-  // oBundle.save((oError, oData) => {
-  //   if (oError) {
-  //     return oResponse.status(400).json({
-  //       error: errorHandler(oError)
-  //     });
-  //   }
-  //   oResponse.json({ data: oData });
-  // });
+  const oBundle = new oBundleModel(oRequest.body);
+  oBundle.save((oError, oData) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: errorHandler(oError)
+      });
+    }
+    oResponse.json({ data: oData });
+  });
 };
 
 /**
