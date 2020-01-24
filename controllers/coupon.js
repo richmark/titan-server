@@ -58,11 +58,60 @@ exports.couponByCode = (oRequest, oResponse, oNext, sCode) => {
 };
 
 /**
+ * Coupon Search
+ * This function searches through the coupon table
+ */
+exports.couponSearch = (oRequest, oResponse) => {
+  let queryString = oRequest.body.query;
+  oCouponModel
+    .find({
+      $or: [
+        {
+          coupon_name: { $regex: queryString }
+        },
+        {
+          coupon_code: { $regex: queryString }
+        },
+        {
+          description: { $regex: queryString }
+        },
+        {
+          coupon_type: { $regex: queryString }
+        }
+      ]
+    })
+    .exec((oError, oCoupon) => {
+      if (oError || !oCoupon) {
+        return oResponse.status(400).json({
+          error: "Coupon does not exist!"
+        });
+      }
+      oResponse.json({ data: oCoupon });
+    });
+};
+
+/**
  * getCoupon function
  * this function gets coupon by ID
  */
 exports.getCoupon = (oRequest, oResponse) => {
   return oResponse.json({ data: oRequest.coupon });
+};
+
+/**
+ * countCoupon function
+ * this function gets the count of all products inserted
+ */
+exports.countCoupon = (oRequest, oResponse) => {
+  oCouponModel.countDocuments().exec((oError, iCount) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: "Something went wrong!"
+      });
+    }
+
+    oResponse.json({ data: { count: iCount } });
+  });
 };
 
 /**
