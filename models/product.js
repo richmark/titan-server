@@ -43,6 +43,21 @@ const oProductSchema = new oMongoose.Schema(
     additional_info: {
       type: Array,
       default: []
+    },
+    display: {
+      type: String,
+      enum: ['T', 'F'],
+      default: 'T'
+    },
+    sold_out: {
+      type: String,
+      enum: ['T', 'F'],
+      default: 'F'
+    },
+    brand: {
+      type: String,
+      enum: ['Yojimbo', 'Titan'],
+      default: 'Titan'
     }
   },
   { timestamps: true }
