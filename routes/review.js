@@ -15,9 +15,12 @@ const { productById } = require("../controllers/product");
 const { orderById } = require("../controllers/order");
 const {
   listReviews,
+  listReviewsCount,
   checkReview,
-  reviewById,
-  updateReview
+  updateReview,
+  listReviewsPerProduct,
+  getReviewsPerProductCount,
+  reviewById
 } = require("../controllers/review");
 
 oRouter.post(
@@ -35,8 +38,11 @@ oRouter.put(
   updateReview
 );
 
+oRouter.get('/reviews/admin/:userId', requireSignin, checkAuth, checkAdmin, listReviewsPerProduct);
+oRouter.get('/reviews/admin/:userId/count', requireSignin, checkAuth, checkAdmin, getReviewsPerProductCount);
+oRouter.get('/reviews/product/:productId/count', listReviewsCount);
 oRouter.get('/reviews/product/:productId', listReviews);
-oRouter.get('/reviews/:userId', requireSignin, checkAuth, checkAdmin, listReviews);
+// oRouter.get('/reviews/:userId', requireSignin, checkAuth, checkAdmin, listReviews);
 
 oRouter.param("userId", userById);
 oRouter.param("productId", productById);
