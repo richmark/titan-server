@@ -1,4 +1,5 @@
 const oUserModel = require('../models/user');
+const oProductModel = require('../models/product');
 const oPaymayaModel = require('../models/paymaya');
 const oOrderModel = require('../models/order');
 const oUuidv1 = require("uuid/v1");
@@ -174,6 +175,7 @@ this.insertOrder = (oReq, oRes, oResult) => {
         };
         oOrder.products.push(oSingleProduct); 
     });
+    this.decreaseQuantity(oOrder.products);
     return this.createOrder(oOrder, oRes);
 }
 
@@ -186,5 +188,22 @@ this.createOrder = (oCreate , oResponse) => {
             });
         }
         return oResponse.json({ data: oData });
+    });
+};
+
+this.decreaseQuantity = (aProduct) => {
+    let oBulkOps = aProduct.map((oItem) => {
+        return {
+            updateOne: {
+                filter: {_id: oItem.product},
+                update: {$inc: {stock: -oItem.count, sold: +oItem.count}}
+            }
+        };
+    });
+
+    oProductModel.bulkWrite(oBulkOps, {}, (oError, oProduct) => {
+        if (oError) {
+            console.log(oError);
+        }
     });
 };
