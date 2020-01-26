@@ -9,10 +9,30 @@
 const oReviewModel = require("../models/review");
 const oOrderModel = require("../models/order");
 const { errorHandler } = require("../helpers/dbErrorHandler");
+const oProductModel = require("../models/product");
+const { _ } = require('lodash');
+
+/**
+ * List review count
+ * filter by productId
+ */
+exports.listReviewsCount = (oRequest, oResponse) => {
+    oReviewModel.find({
+        product: oRequest.product._id
+    }).countDocuments((oError, iCount) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: errorHandler(oError)
+            });
+        }
+        oResponse.json({ data: { count: iCount } });
+    });
+};
 
 /**
  * listReview function
  * gets list of all reviews
+ * filter by productId
  */
 exports.listReviews = (oRequest, oResponse) => {
     const iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
@@ -37,8 +57,74 @@ exports.listReviews = (oRequest, oResponse) => {
 };
 
 /**
- * checkReview function
- * check if ordered product is reviewed
+ * Get product detail after sorting reviewed products by count
+ */
+this.getReviewedProductDetail = (oRequest, oResponse, aProducts) => {
+    oProductModel
+    .find({'_id': { $in: aProducts }})
+    .select('product_name image')
+    .exec((oError, aData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: "Products not found"
+            });
+        }
+        var aCombined = JSON.parse(JSON.stringify(aData));
+        aProducts.forEach((oItem, iIndex) => {
+            aCombined[iIndex].count = oItem.count;
+        });
+        oResponse.json({ data: aCombined });
+    });
+};
+
+/**
+ * Getting reviewed products count and grouping it by productId
+ */
+exports.listReviewsPerProduct = (oRequest, oResponse) => {
+    const iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+    // const sOrder = oRequest.query.order ? oRequest.query.order : 'desc';
+    // const skip = parseInt(oRequest.query.skip);
+
+    oReviewModel
+    .aggregate([
+        { $sortByCount: '$product' }
+    ])
+    .limit(iLimit)
+    .exec((oError, aData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: errorHandler(oError)
+            });
+        }
+        this.getReviewedProductDetail(oRequest, oResponse, aData);
+    });
+};
+
+exports.getReviewsPerProductCount = (oRequest, oResponse) => {
+    oReviewModel
+    .aggregate([
+        { $sortByCount: '$product' },
+        {
+            $group: {
+                _id: null,
+                count: { $sum: 1 }
+            }
+        }
+    ])
+    .exec((oError, aData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: errorHandler(oError)
+            });
+        }
+        oResponse.json({ data: aData });
+    });
+}
+
+/**
+ * checkReview function by orderId
+ * check if product is in the ordered product array
+ * or if ordered product is reviewed
  */
 exports.checkReview = (oRequest, oResponse) => {
     const sProductId = JSON.stringify(oRequest.product._id);
