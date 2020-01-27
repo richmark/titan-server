@@ -105,7 +105,7 @@ exports.countProducts = (oRequest, oResponse) => {
 exports.productById = (oRequest, oResponse, oNext, sId) => {
   oProductModel.findById(sId).exec((oError, oProduct) => {
     if (oError || !oProduct) {
-      oResponse.status(400).json({
+      return oResponse.status(400).json({
         error: "Product not found"
       });
     }
