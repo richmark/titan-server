@@ -13,7 +13,8 @@ const {
   updateProduct,
   deleteProduct,
   countProducts,
-  listByCategory
+  listByCategory,
+  productSearch
 } = require("../controllers/product");
 const { userById } = require("../controllers/user");
 const { categoryById } = require("../controllers/category");
@@ -45,6 +46,7 @@ oRouter.delete(
   deleteProduct
 ); // ONGOING
 
+oRouter.post("/product/search", productSearch);
 oRouter.get("/products", listProducts);
 oRouter.get("/products/count", countProducts);
 oRouter.get("/product/:productId", getProductById);

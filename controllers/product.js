@@ -300,3 +300,34 @@ exports.listByCategory = (oRequest, oResponse) => {
       oResponse.json({ size: data.length, data });
     });
 };
+
+/**
+ * Product Search
+ * This function searches through the Product table
+ */
+exports.productSearch = (oRequest, oResponse) => {
+  let queryString = oRequest.body.query;
+  oProductModel
+    .find({
+      $or: [
+        {
+          product_name: { $regex: queryString }
+        },
+        {
+          description: { $regex: queryString }
+        },
+        {
+          brand: { $regex: queryString }
+        }
+      ]
+    })
+    .populate("category", "_id name")
+    .exec((oError, oProduct) => {
+      if (oError || !oProduct) {
+        return oResponse.status(400).json({
+          error: "Product does not exist!"
+        });
+      }
+      oResponse.json({ data: oProduct });
+    });
+};
