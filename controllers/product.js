@@ -311,13 +311,13 @@ exports.productSearch = (oRequest, oResponse) => {
     .find({
       $or: [
         {
-          product_name: { $regex: queryString }
+          product_name: { $regex: new RegExp(queryString, "i") }
         },
         {
-          description: { $regex: queryString }
+          description: { $regex: new RegExp(queryString, "i") }
         },
         {
-          brand: { $regex: queryString }
+          brand: { $regex: new RegExp(queryString, "i") }
         }
       ]
     })
