@@ -1,4 +1,5 @@
 const oUserModel = require('../models/user');
+const oCouponModel = require("../models/coupon");
 const oProductModel = require('../models/product');
 const oPaymayaModel = require('../models/paymaya');
 const oOrderModel = require('../models/order');
@@ -42,7 +43,7 @@ exports.initiateCheckout = (oReq, oRes) => {
         "currency": "PHP",
         "value": oReq.body.amount,
         "details": {
-            "discount": "0",
+            "discount": oReq.body.discount,
             "serviceCharge": "0",
             "shippingFee": oReq.body.shipping_fee,
             "tax": "0",
@@ -77,7 +78,7 @@ exports.initiateCheckout = (oReq, oRes) => {
     });
     checkout.items = aItem;
     var oData = {
-        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success?bData=${oReq.body.bBuyNow}&oBilling=${oReq.body.billing}&oShipping=${oReq.body.shipping}`,
+        "success": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/success?bData=${oReq.body.bBuyNow}&oBilling=${oReq.body.billing}&oShipping=${oReq.body.shipping}&coupon_code=${oReq.body.coupon_code}`,
         "failure": `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/failure`,
         "cancel" : `${FRONT_DOMAIN}/payment/paymaya/${oReq.profile._id}/${sRequestId}/cancel`
     }
@@ -155,7 +156,20 @@ this.checkTransactionOrder = (oData, oRequest, oResponse) => {
     });
 }
 
+this.updateCouponFalse = (sCoupon) => {
+    if (sCoupon) {
+        oCouponModel.findOneAndUpdate(
+            { coupon_code : sCoupon },
+            { $set: { status : false } },
+            (oError, oData) => {
+                
+            }
+        )
+    }
+}
+
 this.insertOrder = (oReq, oRes, oResult) => {
+    this.updateCouponFalse(oReq.body.coupon_code);
     var aItems = oResult.items;
     var oOrder = {
         user: oReq.profile._id,
@@ -163,6 +177,7 @@ this.insertOrder = (oReq, oRes, oResult) => {
         shipping: oReq.body.oShipping, 
         transaction_id: oResult.paymentDetails.responses.efs.receipt.transactionId,
         amount: oResult.totalAmount.amount,
+        discount_fee: oResult.totalAmount.details.discount,
         shipping_fee: oResult.totalAmount.details.shippingFee,
         reference_number: oResult.requestReferenceNumber,
         products: []
