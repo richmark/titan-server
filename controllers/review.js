@@ -38,12 +38,20 @@ exports.listReviews = (oRequest, oResponse) => {
     const iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
     const sOrder = oRequest.query.order ? oRequest.query.order : 'desc';
     const skip = parseInt(oRequest.query.skip);
-    const oArgs = oRequest.product ? { product: oRequest.product._id } : {};
+    var oArgs = {};
 
+    if (oRequest.product) {
+        oArgs = { product: oRequest.product._id };
+    }
+
+    if (oRequest.query.visibility) {
+        oArgs['visibility'] = true;
+    }
+    console.log(oArgs);
     oReviewModel
     .find(oArgs)
     .limit(iLimit)
-    .populate("user", "_id email") // first or last name
+    .populate("user", "-_id first_name last_name") // id or email
     .sort([['_id', sOrder]])
     .skip(skip)
     .exec((oError, oData) => {
