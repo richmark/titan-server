@@ -47,7 +47,7 @@ exports.listReviews = (oRequest, oResponse) => {
     if (oRequest.query.visibility) {
         oArgs['visibility'] = true;
     }
-    console.log(oArgs);
+
     oReviewModel
     .find(oArgs)
     .limit(iLimit)
