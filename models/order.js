@@ -120,6 +120,10 @@ const oOrderSchema = new oMongoose.Schema(
     shipping_fee: {
         type: Number
     },
+    discount_fee: {
+        type: Number,
+        default: 0
+    },
     reference_number: {
         type: String,
     }, 
