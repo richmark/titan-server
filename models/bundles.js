@@ -1,7 +1,7 @@
 /**
  * Titan Ecommerce (Server)
  * models/bundles.js
- * @author Richamrk Jinn Ravina <richmark.jinn.ravina@gmail.com>
+ * @author Richmark Jinn Ravina <richmark.jinn.ravina@gmail.com>
  * @date 01/12/2020
  * @version 1.0
  */

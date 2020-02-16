@@ -1,7 +1,7 @@
 /**
  * Titan Ecommerce (Server)
  * models/order.js
- * @author Richamrk Jinn Ravina <richmark.jinn.ravina@gmail.com>
+ * @author Richmark Jinn Ravina <richmark.jinn.ravina@gmail.com>
  * @date 12/06/2019
  * @version 1.0
  */
