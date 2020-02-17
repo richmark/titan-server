@@ -8,6 +8,7 @@
 
 const oBannerModel = require("../models/banner");
 const { errorHandler } = require('../helpers/dbErrorHandler');
+const oFileSystem = require("fs");
 
 this.setRequestBodyImage = oRequest => {
     if (typeof oRequest.files !== "undefined") {
@@ -80,16 +81,56 @@ exports.updateBanner = (oRequest, oResponse) => {
 };
 
 /**
- * TODO: delete images on images/banner/
+ * Find all id first
  */
 exports.deleteBanner = (oRequest, oResponse) => {
-    oBannerModel.deleteMany({ _id: { $in: oRequest.body}}, (oError, oData) => {
+    oBannerModel.find({'_id': { $in: oRequest.body }})
+    .select('_id banner_image')
+    .exec((oError, oData) => {
+        if (oError || oData.length < 1) {
+            return oResponse.status(400).json({
+                error: "Banners not found"
+            });
+        }
+        return this.deleteActualBanner(oData, oResponse);
+    });
+};
+
+/**
+ * Delete actual banner
+ */
+this.deleteActualBanner = (oRequest, oResponse) => {
+    var aBannerId = oRequest.map(oItem => oItem._id);
+    oBannerModel.deleteMany(
+        { _id: { $in: aBannerId } },
+        (oError, oData) => {
         if (oError) {
             return oResponse.status(400).json({
                 error: errorHandler(oError)
             });
         }
-        console.log(oData);
-        oResponse.json({data: oData});
+        var aError = this.deleteBannerImage(oRequest);
+        if (aError.length > 0) {
+            return oResponse
+            .status(400)
+            .json({ error: "Error in deleting images" }); // refactor, delete first before updating
+        }
+        oResponse.json({ data: oData });
     });
+};
+
+/**
+ * Retrieved banner data from find function returns with image file name
+ * Image file name would be also deleted
+ */
+this.deleteBannerImage = (oRequest) => {
+    var aError = [];
+    oRequest.forEach(oItem => {
+        oFileSystem.unlink(`public/images/banners/${oItem.banner_image}`, oError => {
+            if (oError) {
+                aError.push(oError.message);
+            }
+        });
+    });
+    return aError;
 };
