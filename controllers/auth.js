@@ -199,7 +199,10 @@ this.saveRegisterUser = async (oRequest, oResponse) => {
       error: errorHandler(oError)
     });
   }
-
+  if (oUser.role === 5) {
+    oResponse.json({ data: oUser });
+    return;
+  }
   return this.createVerificationToken(oUserData, oResponse);
 };
 

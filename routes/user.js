@@ -12,20 +12,63 @@ const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { uploadImage } = require("../middlewares/handleUserImage");
-const { userById, updateUser, getUser, updateUserPassword, checkUserPassword, getAllWholesalers, wholesalerById, getWholesaler, updateWholesaler } = require("../controllers/user");
+const {
+  userById,
+  updateUser,
+  getUser,
+  updateUserPassword,
+  checkUserPassword,
+  getAllWholesalers,
+  getAllSubadmins,
+  wholesalerById,
+  getWholesaler,
+  updateWholesaler,
+  deleteUser
+} = require("../controllers/user");
 
 /**
  * TODO: add proper middlewares
  */
-oRouter.get("/users/:userId/wholesaler/:wholesalerId", requireSignin, checkAuth, checkAdmin, getWholesaler);
-oRouter.put("/users/:userId/wholesaler/:wholesalerId", requireSignin, checkAuth, checkAdmin, updateWholesaler);
-oRouter.get("/users/:userId", requireSignin, checkAuth, checkAdmin, getAllWholesalers);
+oRouter.get(
+  "/users/:userId/wholesaler/:wholesalerId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  getWholesaler
+);
+oRouter.put(
+  "/users/:userId/wholesaler/:wholesalerId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  updateWholesaler
+);
+oRouter.get(
+  "/users/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  getAllWholesalers
+);
+oRouter.get(
+  "/users/subadmins/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  getAllSubadmins
+);
 
 oRouter.get("/user/:userId", requireSignin, checkAuth, getUser);
-oRouter.put("/user/password/:userId", requireSignin, checkAuth, updateUserPassword);
+oRouter.put(
+  "/user/password/:userId",
+  requireSignin,
+  checkAuth,
+  updateUserPassword
+);
 oRouter.put("/user/:userId", requireSignin, uploadImage, updateUser);
 oRouter.param("userId", userById);
 oRouter.param("wholesalerId", wholesalerById);
 
-module.exports = oRouter;
+oRouter.delete("/user/:userId", requireSignin, deleteUser);
 
+module.exports = oRouter;

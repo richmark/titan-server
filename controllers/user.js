@@ -44,31 +44,31 @@ this.setRequestBodyImage = oRequest => {
 exports.updateUserPassword = (oRequest, oResponse) => {
   oUserModel.findById(oRequest.profile._id).exec((oError, oUserData) => {
     if (!oUserData.authenticatePassword(oRequest.body.current_password)) {
-      return oResponse.status(401).json({ error: 'Invalid Password!' });
+      return oResponse.status(401).json({ error: "Invalid Password!" });
     }
     delete oRequest.body.current_password;
     return this.changeUserPassword(oRequest, oResponse);
   });
-  
 };
 
 /**
  * Change User Password
  */
 this.changeUserPassword = async (oRequest, oResponse) => {
-  
   const oUserData = await oUserModel.findOne({
-    _id: oRequest.profile._id,
+    _id: oRequest.profile._id
   });
 
   oUserData.password = oRequest.body.password;
   const oSavedData = await oUserData.save();
   if (!oSavedData) {
     return oResponse.status(401).send({
-        error: 'Unable to change password.'
+      error: "Unable to change password."
     });
   }
-  return oResponse.status(200).send({ message: 'Successfully changed your password.' });
+  return oResponse
+    .status(200)
+    .send({ message: "Successfully changed your password." });
 };
 
 exports.updateUser = (oRequest, oResponse) => {
@@ -109,18 +109,38 @@ exports.getUser = (oRequest, oResponse) => {
  * Get all verified emails with non admin and non personal role
  */
 exports.getAllWholesalers = (oRequest, oResponse) => {
-  oUserModel.find({ role: { $nin: [1, 2] }, verified_email: { $ne: false }})
-  .select('company_name verified_admin')
-  .exec((oError, oUserData) => {
-    if (oError || !oUserData) {
-      return oResponse.status(400).json({
-        error: "User not found"
+  oUserModel
+    .find({ role: { $nin: [1, 2] }, verified_email: { $ne: false } })
+    .select("company_name verified_admin")
+    .exec((oError, oUserData) => {
+      if (oError || !oUserData) {
+        return oResponse.status(400).json({
+          error: "User not found"
+        });
+      }
+      return oResponse.status(200).json({
+        data: oUserData
       });
-    }
-    return oResponse.status(200).json({
-      data: oUserData
     });
-  });
+};
+
+/**
+ * Get all verified emails with non admin and non personal role
+ */
+exports.getAllSubadmins = (oRequest, oResponse) => {
+  oUserModel
+    .find({ role: 5 })
+    .select("_id email subadmin_password")
+    .exec((oError, oUserData) => {
+      if (oError || !oUserData) {
+        return oResponse.status(400).json({
+          error: "User not found"
+        });
+      }
+      return oResponse.status(200).json({
+        data: oUserData
+      });
+    });
 };
 
 /**
@@ -128,24 +148,27 @@ exports.getAllWholesalers = (oRequest, oResponse) => {
  * checks if user exist
  */
 exports.wholesalerById = (oRequest, oResponse, oNext, sId) => {
-  oUserModel.findById(sId)
-  .select('-hashed_password -salt -role -passwordResetToken -passwordResetExpires -passwordChangedAt')
-  .exec((oError, oUserData) => {
-    if (oError || !oUserData) {
-      return oResponse.status(400).json({
-        error: "User not found"
-      });
-    }
-    oRequest.wholesaler = oUserData;
-    oNext();
-  });
+  oUserModel
+    .findById(sId)
+    .select(
+      "-hashed_password -salt -role -passwordResetToken -passwordResetExpires -passwordChangedAt"
+    )
+    .exec((oError, oUserData) => {
+      if (oError || !oUserData) {
+        return oResponse.status(400).json({
+          error: "User not found"
+        });
+      }
+      oRequest.wholesaler = oUserData;
+      oNext();
+    });
 };
 
 exports.getWholesaler = (oRequest, oResponse) => {
   return oResponse.status(200).json({
-    data: oRequest.wholesaler,
+    data: oRequest.wholesaler
   });
-}
+};
 
 exports.updateWholesaler = (oRequest, oResponse) => {
   oUserModel.findOneAndUpdate(
@@ -171,4 +194,22 @@ exports.updateWholesaler = (oRequest, oResponse) => {
       });
     }
   );
-}
+};
+
+/**
+ * deleteCoupon function
+ * deletes coupon
+ */
+exports.deleteUser = (oRequest, oResponse) => {
+  const oUser = oRequest.profile;
+  oUser.remove(oError => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: errorHandler(oError)
+      });
+    }
+    oResponse.json({
+      message: "User deleted!"
+    });
+  });
+};
