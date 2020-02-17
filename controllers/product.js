@@ -315,9 +315,6 @@ exports.productSearch = (oRequest, oResponse) => {
         },
         {
           description: { $regex: new RegExp(queryString, "i") }
-        },
-        {
-          brand: { $regex: new RegExp(queryString, "i") }
         }
       ]
     })
