@@ -40,6 +40,14 @@ oRouter.delete(
     deleteBanner
 );
 
+/**
+ * endpoint for public
+ */
+oRouter.get('/banners', listBanners);
+
+/**
+ * endpoint for admin
+ */
 oRouter.get('/banners/:userId', requireSignin, checkAuth, checkAdmin, listBanners);
 oRouter.get('/banners/:userId/:bannerId', requireSignin, checkAuth, checkAdmin, getBannerById);
 
