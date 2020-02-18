@@ -1,7 +1,7 @@
 /**
  * Titan Ecommerce (Server)
  * middlewares/handleCategoryImage.js
- * @author Richamrk Jinn Ravina <richmark.jinn.ravina@gmail.com>
+ * @author Richmark Jinn Ravina <richmark.jinn.ravina@gmail.com>
  * @date 12/2/2019 8:52 PM
  * @version 1.0
  */
