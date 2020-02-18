@@ -75,15 +75,19 @@ const oUserSchema = new oMongoose.Schema(
       trim: true,
       maxlength: 255
     },
-    hashed_password: {
-      type: String,
-      required: true
-    },
-    salt: String,
     role: {
       type: Number,
       required: true
     },
+    hashed_password: {
+      type: String,
+      required: true
+    },
+    subadmin_password: {
+      type: String
+    },
+    salt: String,
+
     verified_email: {
       type: Boolean,
       default: false
