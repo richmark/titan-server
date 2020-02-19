@@ -12,7 +12,7 @@ const oRouter = oExpress.Router();
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
 const { uploadImage } = require("../middlewares/handleBannerImage");
-const { createBanner, listBanners, updateBanner, bannerById, getBannerById, deleteBanner } = require("../controllers/banner");
+const { createBanner, listBanners, updateBanner, bannerById, getBannerById, deleteBanner, listBannersByVisibility } = require("../controllers/banner");
 
 oRouter.post(
     "/banner/create/:userId",
@@ -43,7 +43,7 @@ oRouter.delete(
 /**
  * endpoint for public
  */
-oRouter.get('/banners', listBanners);
+oRouter.get('/banners', listBannersByVisibility);
 
 /**
  * endpoint for admin

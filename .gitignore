@@ -3,5 +3,6 @@ public/images/users/user-*
 public/images/categories/category-*
 public/images/products/product-*
 public/images/bundles/bundle-*
+public/images/banners/banner-*
 .env
 package-lock.json
