@@ -47,6 +47,21 @@ exports.listBanners = (oRequest, oResponse) => {
     });
 };
 
+exports.listBannersByVisibility = (oRequest, oResponse) => {
+    oBannerModel
+    .find({ visibility : true })
+    .select()
+    .sort([['createdAt', 'desc']])
+    .exec((oError, oData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: errorHandler(oError)
+        });
+      }
+      oResponse.json({ data: oData });
+    });
+};
+
 exports.bannerById = (oRequest, oResponse, oNext, sId) => {
     oBannerModel.findById(sId).exec((oError, oBannerData) => {
         if (oError || !oBannerData) {
