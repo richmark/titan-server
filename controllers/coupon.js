@@ -119,25 +119,14 @@ exports.countCoupon = (oRequest, oResponse) => {
  * This function lists coupon with search filters.
  */
 exports.listCoupon = (oRequest, oResponse) => {
-  let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
-  let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
-  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
-  let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
-
-  oCouponModel
-    .find()
-    .select()
-    .sort([[sSortBy, sOrder]])
-    .limit(iLimit)
-    .skip(iOffset)
-    .exec((oError, oData) => {
-      if (oError) {
-        return oResponse.status(400).json({
-          error: "Products not found"
-        });
-      }
-      oResponse.json({ data: oData });
-    });
+  oCouponModel.find().exec((oError, oData) => {
+    if (oError) {
+      return oResponse.status(400).json({
+        error: "Products not found"
+      });
+    }
+    oResponse.json({ data: oData });
+  });
 };
 
 /**

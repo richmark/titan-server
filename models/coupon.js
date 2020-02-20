@@ -45,6 +45,10 @@ const oCouponSchema = new oMongoose.Schema(
       type: Date,
       required: true
     },
+    used_by: {
+      type: String,
+      default: "Unused"
+    },
     status: {
       type: Boolean,
       default: false
