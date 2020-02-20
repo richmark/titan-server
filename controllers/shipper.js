@@ -91,3 +91,36 @@ exports.updateShipper = (oRequest, oResponse) => {
     }
   );
 }
+
+/**
+ * Find all id first
+ */
+exports.deleteShipper = (oRequest, oResponse) => {
+  oShipperModel.find({'_id': { $in: oRequest.body }})
+  .select('_id')
+  .exec((oError, oData) => {
+      if (oError || oData.length < 1) {
+          return oResponse.status(400).json({
+              error: "Shipper(s) not found"
+          });
+      }
+      return this.deleteActualShipper(oData, oResponse);
+  });
+};
+
+/**
+ * Delete actual banner
+ */
+exports.deleteActualShipper = (oRequest, oResponse) => {
+  var aShipperId = oRequest.map(oItem => oItem._id);
+  oShipperModel.deleteMany(
+      { _id: { $in: aShipperId } },
+      (oError, oData) => {
+      if (oError) {
+          return oResponse.status(400).json({
+              error: errorHandler(oError)
+          });
+      }
+      oResponse.json({ data: oData });
+  });
+};
