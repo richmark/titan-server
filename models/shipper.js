@@ -29,6 +29,11 @@ const oShipperSchema = new oMongoose.Schema(
             type: String,
             trim: true,
             required: true
+        },
+        shipper_website: {
+            type: String,
+            trim: true,
+            required: true
         }
     },
     { timestamps: true }
