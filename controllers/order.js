@@ -57,6 +57,7 @@ exports.listOrders = (oRequest, oResponse) => {
 exports.orderById = (oRequest, oResponse, oNext, sId) => {
     oOrderModel
     .findById(sId)
+    .populate('shipper')
     .select()
     .exec((oError, oOrder) => {
         if (oError || !oOrder) {
@@ -124,7 +125,6 @@ exports.getOrderByUser = (oRequest, oResponse) => {
  */
 exports.updateOrderById = (oRequest, oResponse) => {
     let oQuery = this.setQuery(oRequest.body, oRequest.order.status);
-    
     oOrderModel.findOneAndUpdate(
         { _id: oRequest.order._id},
         oQuery,
@@ -142,27 +142,26 @@ exports.updateOrderById = (oRequest, oResponse) => {
 /**
  * returns note prefix
  */
-this.getNote = (sKey) => {
+this.getNote = (oData) => {
     return {
-        Processing: 'Processing with tracking number of ',
-        Shipped: '',
-        Delivered: '',
-        Cancelled: ''
-    }[sKey];
+        Processing: `Processing with tracking number of ${oData.tracking_number}`,
+        Shipped: `Order has been shipped via ${oData.shipper_name}`,
+        Delivered: 'Order has been delivered',
+        Cancelled: 'Order has been cancelled'
+    }[oData.status];
 };
 
 /**
  * Set Query
- * available to change shipper if status is the same
- * if not the same, set change and push another array to history
+ * Assume that tracking_number and shipper are always changing
  */
-this.setQuery = (oNewOrderData, sOrderStatus) => {
+this.setQuery = (oData) => {
     let oHistory = {
-        status: oNewOrderData.status,
-        note: this.getNote(oNewOrderData.status) + oNewOrderData.tracking_number,
+        status: oData.status,
+        note: this.getNote(oData),
     };
-    if (oNewOrderData.status === sOrderStatus) {
-        return {$set: { shipper: oNewOrderData.category }};
-    }
-    return {$set: { shipper: oNewOrderData.category, status: oNewOrderData.status }, $push: { history: oHistory }};
+    return {
+        $set: { shipper: oData.shipper_id, status: oData.status, tracking_number: oData.tracking_number },
+        $push: { history: oHistory } // push a history for every update of an order 
+    };
 }

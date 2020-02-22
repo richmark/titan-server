@@ -8,6 +8,7 @@
 
 const oMongoose = require('mongoose');
 const { ObjectId } = oMongoose.Schema;
+require("dotenv").config();
 
 const oOrderedProductSchema = new oMongoose.Schema(
     {
@@ -60,11 +61,12 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     shipper: {
-        type: String,
-        default: 'Basic Shipper'
-        // type: ObjectId,
-        // ref: 'Shipper',
-        // required: true
+        // type: String,
+        // default: 'Basic Shipper'
+        type: ObjectId,
+        ref: 'Shipper',
+        required: true,
+        default: process.env.DEFAULT_SHIPPER // consider that default ObjectId is present in shipper model
     },
     status: {
         type: String,
@@ -126,7 +128,11 @@ const oOrderSchema = new oMongoose.Schema(
     },
     reference_number: {
         type: String,
-    }, 
+    },
+    tracking_number: { // manual input from client
+        type: String,
+        default: ''
+    }
   },
   { timestamps: true }
 );
