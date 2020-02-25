@@ -61,12 +61,8 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     shipper: {
-        // type: String,
-        // default: 'Basic Shipper'
-        type: ObjectId,
-        ref: 'Shipper',
-        required: true,
-        default: process.env.DEFAULT_SHIPPER // consider that default ObjectId is present in shipper model
+        type: ObjectId, // objectId without required field and default value
+        ref: 'Shipper'
     },
     status: {
         type: String,
