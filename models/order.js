@@ -8,7 +8,6 @@
 
 const oMongoose = require('mongoose');
 const { ObjectId } = oMongoose.Schema;
-require("dotenv").config();
 
 const oOrderedProductSchema = new oMongoose.Schema(
     {
