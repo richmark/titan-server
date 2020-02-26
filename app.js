@@ -27,10 +27,11 @@ const oShipperRoutes = require("./routes/shipper");
 const oOrderRoutes = require("./routes/order");
 const oCouponRoutes = require("./routes/coupon");
 const oReviewRoutes = require("./routes/review");
-const oBundleRoutes = require('./routes/bundles')
+const oBundleRoutes = require("./routes/bundles");
 const oBrainTreeRoutes = require("./routes/braintree");
 const oPaymayaRoutes = require("./routes/paymaya");
 const oBannerRoutes = require("./routes/banner");
+const oLevelRoutes = require("./routes/level");
 
 /**
  * App Instance
@@ -75,6 +76,7 @@ oApp.use("/api/v1", oPaymayaRoutes);
 oApp.use("/api/v1", oCouponRoutes);
 oApp.use("/api/v1", oBundleRoutes);
 oApp.use("/api/v1", oBannerRoutes);
+oApp.use("/api/v1", oLevelRoutes);
 
 /**
  * Default port 8000
