@@ -131,7 +131,7 @@ exports.updateOrderById = (oRequest, oResponse) => {
         (oError, oData) => {
             if (oError) {
                 return oResponse.status(400).json({
-                error: errorHandler(oError)
+                    error: errorHandler(oError)
                 });
             }
             oResponse.json({ data: oData });
@@ -144,8 +144,8 @@ exports.updateOrderById = (oRequest, oResponse) => {
  */
 this.getNote = (oData) => {
     return {
-        Processing: `Processing with tracking number of ${oData.tracking_number}`,
-        Shipped: `Order has been shipped via ${oData.shipper_name}`,
+        Processing: `Order is now being processed`,
+        Shipped: `Order has been shipped via ${oData.shipper_name} with tracking number of ${oData.tracking_number}`,
         Delivered: 'Order has been delivered',
         Cancelled: 'Order has been cancelled'
     }[oData.status];
