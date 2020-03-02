@@ -7,6 +7,7 @@
  */
 
 const oProductModel = require("../models/product");
+const oReviewModel = require("../models/review");
 const oFormidable = require("formidable");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 const _ = require("lodash");
@@ -72,15 +73,27 @@ exports.listProducts = (oRequest, oResponse) => {
     .sort([[sSortBy, sOrder]])
     .limit(iLimit)
     .skip(iOffset)
-    .exec((oError, oData) => {
+    .exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
           error: "Products not found"
         });
       }
-      oResponse.json({ data: oData });
+      aData.forEach((oData) => {
+        this.getReviews({product: oData._id}) 
+      });
+      return oResponse.json({ data: aData});
     });
 };
+
+/**
+ * Get Reviews function
+ */
+this.getReviews = (oProductName) => {
+  oReviewModel.find(oProductName).exec((oError, aData) => {
+    console.log(aData);
+  });
+}
 
 /**
  * countProduct function
