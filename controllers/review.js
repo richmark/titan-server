@@ -77,10 +77,18 @@ this.getReviewedProductDetail = (oRequest, oResponse, aProducts) => {
                 error: "Products not found"
             });
         }
-        var aCombined = JSON.parse(JSON.stringify(aData));
-        aProducts.forEach((oItem, iIndex) => {
-            aCombined[iIndex].count = oItem.count;
+
+        var aParsedData = JSON.parse(JSON.stringify(aData)); // typecast ObjectId values string
+        var aParsedProducts = JSON.parse(JSON.stringify(aProducts)); // typecast ObjectId values string
+        var aCombined = [];
+
+        aParsedData.forEach((sValue, sIndex) => {
+            aCombined.push({
+                ...aParsedData[sIndex],
+                ...(aParsedProducts.find((oItem) => oItem._id === aParsedData[sIndex]._id))
+            });
         });
+
         oResponse.json({ data: aCombined });
     });
 };
