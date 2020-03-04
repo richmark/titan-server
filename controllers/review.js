@@ -125,7 +125,7 @@ exports.getReviewsPerProductCount = (oRequest, oResponse) => {
                 error: errorHandler(oError)
             });
         }
-        oResponse.json({ data: aData });
+        return oResponse.json({ data: aData });
     });
 }
 

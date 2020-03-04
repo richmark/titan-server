@@ -59,41 +59,68 @@ exports.registerProduct = (oRequest, oResponse) => {
  * listProducts function
  * this function returns list of products
  * this function accepts query parameters (limit, sortBy, order, offset)
+ * include reviews
  */
 exports.listProducts = (oRequest, oResponse) => {
-  let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
+  let oSort = {};
+  let iOrder = parseInt(oRequest.query.order ? oRequest.query.order : 1, 10);
   let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
+  oSort[sSortBy] = iOrder;
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
-
-  oProductModel
-    .find()
-    .select()
-    .populate("category")
-    .sort([[sSortBy, sOrder]])
-    .limit(iLimit)
-    .skip(iOffset)
-    .exec((oError, aData) => {
+  
+  oProductModel.aggregate([
+    { 
+      $lookup: {
+        from: 'reviews',
+        let: { product_id: "$_id"},
+        pipeline: [
+          { $match:
+             { $expr:
+                { $and:
+                   [
+                     { $eq: [ "$product",  "$$product_id" ] },
+                     { $eq: [ "$visibility", true ] }
+                   ]
+                }
+             }
+          },
+          { $project: {
+              _id        : 0,
+              rate       : 1
+            } 
+          }
+       ],
+        as: 'reviews'
+      },
+    },
+    { 
+      $lookup: {
+        from: 'categories',
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category'
+      }
+    },
+    { 
+      $sort: oSort
+    },
+    { 
+      $skip: iOffset
+    },
+    { 
+      $limit: iLimit
+    },
+  ]).exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
           error: "Products not found"
         });
       }
-      aData.forEach((oData) => {
-        this.getReviews({product: oData._id}) 
-      });
       return oResponse.json({ data: aData});
-    });
+  });
 };
 
-/**
- * Get Reviews function
- */
-this.getReviews = (oProductName) => {
-  oReviewModel.find(oProductName).exec((oError, aData) => {
-    console.log(aData);
-  });
-}
 
 /**
  * countProduct function
@@ -187,22 +214,56 @@ exports.listBySearch = (oRequest, oResponse) => {
  */
 exports.listRelated = (oRequest, oResponse) => {
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
-
-  oProductModel
-    .find({
-      _id: { $ne: oRequest.product },
-      category: oRequest.product.category
-    })
-    .limit(iLimit)
-    .populate("category", "_id name")
-    .exec((oError, oProduct) => {
+  oProductModel.aggregate([
+    { 
+      $match : { 
+        _id     : { $ne: oRequest.product._id },
+        category: oRequest.product.category 
+      } 
+    },
+    { 
+      $lookup: {
+        from: 'reviews',
+        let: { product_id: "$_id"},
+        pipeline: [
+          { $match:
+             { $expr:
+                { $and:
+                   [
+                     { $eq: [ "$product",  "$$product_id" ] },
+                     { $eq: [ "$visibility", true ] }
+                   ]
+                }
+             }
+          },
+          { $project: {
+              _id        : 0,
+              rate       : 1
+            } 
+          }
+       ],
+        as: 'reviews'
+      },
+    },
+    { 
+      $lookup: {
+        from: 'categories',
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category'
+      }
+    },
+    { 
+      $limit: iLimit
+    },
+  ]).exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
           error: "Products not found"
         });
       }
-      oResponse.json({ data: oProduct });
-    });
+      return oResponse.json({ data: aData});
+  });
 };
 
 /**
