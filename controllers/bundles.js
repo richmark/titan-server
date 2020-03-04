@@ -88,8 +88,8 @@ exports.getBundleById = (oRequest, oResponse) => {
 }
 
 /**
- * createBundle function
- * this function create bundle
+ * updateBundle function
+ * this function update bundle
  */
 exports.updateBundle = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);

@@ -18,8 +18,13 @@ const oReviewSchema = new oMongoose.Schema(
         },
         product: {
             type: ObjectId,
-            ref: 'Product',
+            refPath: 'onModel',
             required: true
+        },
+        onModel: {
+            type: String,
+            required: true,
+            enum: ['Product', 'Bundles']
         },
         comment: {
             type: String,
