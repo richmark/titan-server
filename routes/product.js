@@ -14,7 +14,10 @@ const {
   deleteProduct,
   countProducts,
   listByCategory,
-  productSearch
+  productSearch,
+  listProductsClient,
+  listRelatedClient,
+  productSearchClient
 } = require("../controllers/product");
 const { userById } = require("../controllers/user");
 const { categoryById } = require("../controllers/category");
@@ -54,6 +57,11 @@ oRouter.post("/products/by/search", listBySearch);
 oRouter.get("/products/related/:productId", listRelated);
 oRouter.get("/products/categories", listCategories);
 oRouter.get("/products/category/:categoryId", listByCategory);
+
+// Client Side Route
+oRouter.get("/products/client/:productId", listRelatedClient);
+oRouter.get("/products/client", listProductsClient);
+oRouter.post("/product/client/search", productSearchClient);
 
 oRouter.param("userId", userById);
 oRouter.param("productId", productById);
