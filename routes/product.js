@@ -17,7 +17,8 @@ const {
   productSearch,
   listProductsClient,
   listRelatedClient,
-  productSearchClient
+  productSearchClient,
+  listByCategoryClient
 } = require("../controllers/product");
 const { userById } = require("../controllers/user");
 const { categoryById } = require("../controllers/category");
@@ -62,9 +63,11 @@ oRouter.get("/products/category/:categoryId", listByCategory);
 oRouter.get("/products/client/:productId", listRelatedClient);
 oRouter.get("/products/client", listProductsClient);
 oRouter.post("/product/client/search", productSearchClient);
+oRouter.get("/products/client/category/:categoryId", listByCategoryClient);
 
 oRouter.param("userId", userById);
 oRouter.param("productId", productById);
 oRouter.param("categoryId", categoryById);
+
 
 module.exports = oRouter;
