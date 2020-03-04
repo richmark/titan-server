@@ -472,3 +472,43 @@ exports.productSearchClient = (oRequest, oResponse) => {
       return oResponse.json({ data: aData});
   });
 };
+
+/**
+ * List By Category Client Side
+ */
+exports.listByCategoryClient = (oRequest, oResponse) => {
+  var oSort = {};
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  let iOrder = parseInt(oRequest.query.order ? oRequest.query.order : -1, 10);
+  oSort['_id'] = iOrder;
+  let iSkip = parseInt(oRequest.query.skip);
+  oProductModel.aggregate([
+    { 
+      $match : { 
+        category: oRequest.category._id
+      } 
+    },
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $lookup: oCategoryLookup
+    },
+    { 
+      $sort: oSort
+    },
+    { 
+      $skip: iSkip
+    },
+    { 
+      $limit: iLimit
+    },
+  ]).exec((oError, aData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      return oResponse.json({ data: aData});
+  });
+};
