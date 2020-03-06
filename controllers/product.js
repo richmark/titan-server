@@ -7,6 +7,7 @@
  */
 
 const oProductModel = require("../models/product");
+const oReviewModel = require("../models/review");
 const oFormidable = require("formidable");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 const _ = require("lodash");
@@ -327,4 +328,187 @@ exports.productSearch = (oRequest, oResponse) => {
       }
       oResponse.json({ data: oProduct });
     });
+};
+
+/**
+ * For product x category lookup
+ */
+const oReviewLookup = {
+  from: 'reviews',
+  let: { product_id: "$_id"},
+  pipeline: [
+    { $match:
+        { $expr:
+          { $and:
+              [
+                { $eq: [ "$product",  "$$product_id" ] },
+                { $eq: [ "$visibility", true ] }
+              ]
+          }
+        }
+    },
+    { $project: {
+        _id        : 0,
+        rate       : 1
+      } 
+    }
+  ],
+  as: 'reviews'
+};
+
+/**
+ * For product x category lookup
+ */
+const oCategoryLookup = {
+  from: 'categories',
+  localField: 'category',
+  foreignField: '_id',
+  as: 'category'
+};
+
+/**
+ * listRelated function
+ * lists products with the same category except the product itself
+ */
+exports.listRelatedClient = (oRequest, oResponse) => {
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  oProductModel.aggregate([
+    { 
+      $match : { 
+        _id     : { $ne: oRequest.product._id },
+        category: oRequest.product.category 
+      } 
+    },
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $lookup: oCategoryLookup
+    },
+    { 
+      $limit: iLimit
+    },
+  ]).exec((oError, aData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      return oResponse.json({ data: aData});
+  });
+};
+
+/**
+ * listProducts function
+ * this function returns list of products
+ * this function accepts query parameters (limit, sortBy, order, offset)
+ * include reviews
+ */
+exports.listProductsClient = (oRequest, oResponse) => {
+  let oSort = {};
+  let iOrder = parseInt(oRequest.query.order ? oRequest.query.order : 1, 10);
+  let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
+  oSort[sSortBy] = iOrder;
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
+  
+  oProductModel.aggregate([
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $lookup: oCategoryLookup,
+    },
+    { 
+      $sort: oSort
+    },
+    { 
+      $skip: iOffset
+    },
+    { 
+      $limit: iLimit
+    },
+  ]).exec((oError, aData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      return oResponse.json({ data: aData});
+  });
+};
+
+/**
+ * Product Search Client Side
+ * This function searches through the Product table
+ */
+exports.productSearchClient = (oRequest, oResponse) => {
+  let queryString = oRequest.body.query;
+  oProductModel.aggregate([
+    { 
+      $match : { 
+        $or: [
+          {
+            product_name: { $regex: new RegExp(queryString, "i") }
+          },
+          {
+            description: { $regex: new RegExp(queryString, "i") }
+          }
+        ]
+      } 
+    },
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $lookup: oCategoryLookup
+    },
+  ]).exec((oError, aData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      return oResponse.json({ data: aData});
+  });
+};
+
+/**
+ * List By Category Client Side
+ */
+exports.listByCategoryClient = (oRequest, oResponse) => {
+  var oSort = {};
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  let iOrder = parseInt(oRequest.query.order ? oRequest.query.order : -1, 10);
+  oSort['_id'] = iOrder;
+  let iSkip = parseInt(oRequest.query.skip);
+  oProductModel.aggregate([
+    { 
+      $match : { 
+        category: oRequest.category._id
+      } 
+    },
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $lookup: oCategoryLookup
+    },
+    { 
+      $sort: oSort
+    },
+    { 
+      $skip: iSkip
+    },
+    { 
+      $limit: iLimit
+    },
+  ]).exec((oError, aData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Products not found"
+        });
+      }
+      return oResponse.json({ data: aData});
+  });
 };
