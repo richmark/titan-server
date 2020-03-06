@@ -32,6 +32,29 @@ const oOrderedProductSchema = new oMongoose.Schema(
     { _id : false }
 );
 
+const oOrderedBundleProductSchema = new oMongoose.Schema(
+    {
+        bundle: {
+            type: ObjectId,
+            ref: "Bundle",
+            required: true
+        },
+        price: {
+            type: Number,
+            required: true
+        },
+        count: {
+            type: Number,
+            required: true
+        },
+        reviewed: {
+            type: Boolean,
+            default: false
+        }
+    },
+    { _id : false }
+);
+
 const oOrderedDetailsSchema = new oMongoose.Schema(
     {
         name: {
@@ -77,8 +100,10 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     products: {
-        type: [oOrderedProductSchema],
-        required: true
+        type: [oOrderedProductSchema]
+    },
+    bundles: {
+        type: [oOrderedBundleProductSchema]
     },
     history: {
         type: [

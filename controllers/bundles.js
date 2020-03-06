@@ -9,6 +9,7 @@
 const oBundleModel = require('../models/bundles');
 const { errorHandler } = require('../helpers/dbErrorHandler');
 const { _ } = require('lodash');
+const oFileSystem = require("fs");
 
 this.setRequestBodyImage = oRequest => {
   if (typeof oRequest.files !== "undefined") {
@@ -68,7 +69,7 @@ exports.listBundles = (oRequest, oResponse) => {
 exports.bundleById = (oRequest, oResponse, oNext, sId) => {
   oBundleModel
   .findById(sId)
-  .populate('products.product', '_id product_name price image ')
+  .populate('products.product', '_id product_name price bundle_thumbnail ')
   .exec((oError, oBundleData) => {
     if (oError || !oBundleData) {
       return oResponse.status(400).json({
@@ -108,4 +109,56 @@ exports.updateBundle = (oRequest, oResponse) => {
       oResponse.json({ data: oData, msg: 'Bundle updated successfully' });
     }
   );
+};
+
+exports.deleteBundle = (oRequest, oResponse) => {
+  oBundleModel.find({'_id': { $in: oRequest.body }})
+  .select('_id bundle_thumbnail')
+  .exec((oError, oData) => {
+      if (oError || oData.length < 1) {
+          return oResponse.status(400).json({
+              error: "Bundles not found"
+          });
+      }
+      return this.deleteActualBundle(oData, oResponse);
+  });
+};
+
+/**
+ * Delete actual bundle
+ */
+this.deleteActualBundle = (oRequest, oResponse) => {
+  var oBundleId = oRequest.map(oItem => oItem._id);
+  oBundleModel.deleteMany(
+      { _id: { $in: oBundleId } },
+      (oError, oData) => {
+      if (oError) {
+          return oResponse.status(400).json({
+              error: errorHandler(oError)
+          });
+      }
+      var aError = this.deleteBundleImage(oRequest);
+      if (aError.length > 0) {
+          return oResponse
+          .status(400)
+          .json({ error: "Error in deleting images" }); // refactor, delete first before updating
+      }
+      oResponse.json({ data: oData });
+  });
+};
+
+/**
+* Retrieved bundle data from find function returns with image file name
+* Image file name would be also deleted
+*/
+this.deleteBundleImage = (oRequest) => {
+  var aError = [];
+  oRequest.forEach(oItem => {
+      oFileSystem.unlink(`public/images/bundles/${oItem.bundle_thumbnail}`, oError => {
+          if (oError) {
+              aError.push(oError.message);
+          }
+      });
+  });
+  return aError;
 };
