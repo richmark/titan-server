@@ -14,6 +14,10 @@ const { userById } = require("../controllers/user");
 const { uploadImage } = require("../middlewares/handleBundleImage");
 const { createBundle, listBundles, bundleById, getBundleById, updateBundle, deleteBundle } = require("../controllers/bundles");
 
+// client
+oRouter.get("/bundles/client/:bundleId", getBundleById);
+oRouter.get("/bundles/client", listBundles);
+
 oRouter.post(
     "/bundle/create/:userId",
     requireSignin,
@@ -46,11 +50,6 @@ oRouter.get(
     checkAuth,
     checkAdmin,
     getBundleById
-);
-
-oRouter.get(
-    "/bundles/",
-    listBundles
 );
 
 oRouter.delete(

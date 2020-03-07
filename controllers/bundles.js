@@ -69,7 +69,7 @@ exports.listBundles = (oRequest, oResponse) => {
 exports.bundleById = (oRequest, oResponse, oNext, sId) => {
   oBundleModel
   .findById(sId)
-  .populate('products.product', '_id product_name price bundle_thumbnail ')
+  .populate('products.product', '_id product_name price image ')
   .exec((oError, oBundleData) => {
     if (oError || !oBundleData) {
       return oResponse.status(400).json({
