@@ -54,6 +54,28 @@ const oBundleSchema = new oMongoose.Schema(
             type: String,
             trim: true,
             required: true
+        },
+        bundle_sold: {
+            type: Number,
+            default: 0
+        },
+        bundle_price: {
+            type: Number,
+            required: true
+        },
+        bundle_stock: {
+            type: Number,
+            required: true
+        },
+        bundle_display: {
+            type: String,
+            enum: ['T', 'F'],
+            default: 'F'
+        },
+        bundle_sold_out: {
+            type: String,
+            enum: ['T', 'F'],
+            default: 'F'
         }
     },
     { timestamps: true }
