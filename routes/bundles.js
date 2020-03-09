@@ -12,9 +12,10 @@ const oRouter = oExpress.Router();
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
 const { uploadImage } = require("../middlewares/handleBundleImage");
-const { createBundle, listBundles, bundleById, getBundleById, updateBundle, deleteBundle } = require("../controllers/bundles");
+const { createBundle, listBundles, bundleById, getBundleById, updateBundle, deleteBundle, listRelatedBundles } = require("../controllers/bundles");
 
 // client
+oRouter.get("/bundles/client/related/:bundleId", listRelatedBundles);
 oRouter.get("/bundles/client/:bundleId", getBundleById);
 oRouter.get("/bundles/client", listBundles);
 
