@@ -45,16 +45,6 @@ const oBundleSchema = new oMongoose.Schema(
             trim: true,
             required: true
         },
-        discount_type: {
-            type: String,
-            trim: true,
-            required: true
-        },
-        discount_value: {
-            type: String,
-            trim: true,
-            required: true
-        },
         bundle_sold: {
             type: Number,
             default: 0
