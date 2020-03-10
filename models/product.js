@@ -1,6 +1,16 @@
 const oMongoose = require("mongoose");
 const { ObjectId } = oMongoose.Schema;
 
+const oBundledProductsSchema = new oMongoose.Schema(
+  {
+    product: {
+      type: ObjectId,
+      ref: "Product"
+    }
+  },
+  { _id: false }
+);
+
 const oProductSchema = new oMongoose.Schema(
   {
     product_name: {
@@ -19,8 +29,7 @@ const oProductSchema = new oMongoose.Schema(
     },
     category: {
       type: ObjectId,
-      ref: "Category",
-      required: true
+      ref: "Category"
     },
     description: {
       type: String,
@@ -46,18 +55,19 @@ const oProductSchema = new oMongoose.Schema(
     },
     display: {
       type: String,
-      enum: ['T', 'F'],
-      default: 'T'
+      enum: ["T", "F"],
+      default: "T"
     },
     sold_out: {
       type: String,
-      enum: ['T', 'F'],
-      default: 'F'
+      enum: ["T", "F"],
+      default: "F"
     },
     brand: {
-      type: String,
-      enum: ['Yojimbo', 'Titan'],
-      default: 'Titan'
+      type: String
+    },
+    bundle_product: {
+      type: [oBundledProductsSchema]
     }
   },
   { timestamps: true }

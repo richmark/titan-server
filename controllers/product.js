@@ -43,6 +43,9 @@ exports.registerProduct = (oRequest, oResponse) => {
   if (typeof oRequest.body.additional_info !== "undefined") {
     oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
   }
+  if (typeof oRequest.body.bundle_product !== "undefined") {
+    oRequest.body.bundle_product = JSON.parse(oRequest.body.bundle_product);
+  }
   oRequest = this.setRequestBodyImage(oRequest);
   const oProduct = new oProductModel(oRequest.body);
   oProduct.save((oError, oData) => {
