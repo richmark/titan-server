@@ -15,10 +15,6 @@ const oBundledProductsSchema = new oMongoose.Schema(
             type: ObjectId,
             ref: "Product",
             required: true
-        },
-        count: {
-            type: Number,
-            required: true
         }
     },
     { _id : false }
