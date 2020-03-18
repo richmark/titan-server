@@ -70,9 +70,9 @@ exports.listProducts = (oRequest, oResponse) => {
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
 
   oProductModel
-    .find()
-    .select()
+    .find({category: {$ne: null} })
     .populate("category")
+    .select()
     .sort([[sSortBy, sOrder]])
     .limit(iLimit)
     .skip(iOffset)
@@ -390,7 +390,7 @@ exports.listRelatedClient = (oRequest, oResponse) => {
     },
     { 
       $limit: iLimit
-    },
+    }
   ]).exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
@@ -416,6 +416,9 @@ exports.listProductsClient = (oRequest, oResponse) => {
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
   
   oProductModel.aggregate([
+    {
+      $match: { category: {$ne: null} }
+    },
     { 
       $lookup: oReviewLookup,
     },
@@ -430,7 +433,7 @@ exports.listProductsClient = (oRequest, oResponse) => {
     },
     { 
       $limit: iLimit
-    },
+    }
   ]).exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
