@@ -6,7 +6,7 @@
  * @version 1.0
  */
 
-const oBundleModel = require('../models/bundles');
+const oProductModel = require('../models/product');
 const { errorHandler } = require('../helpers/dbErrorHandler');
 const { _ } = require('lodash');
 const oFileSystem = require("fs");
@@ -20,33 +20,16 @@ this.setRequestBodyImage = oRequest => {
   return oRequest;
 };
 
-/**
- * createBundle function
- * this function create bundle
- */
-exports.createBundle = (oRequest, oResponse) => {
-  oRequest = this.setRequestBodyImage(oRequest);
-  oRequest.body.products = JSON.parse(oRequest.body.products);
-  const oBundle = new oBundleModel(oRequest.body);
-  oBundle.save((oError, oData) => {
-    if (oError) {
-      return oResponse.status(400).json({
-        error: errorHandler(oError)
-      });
-    }
-    oResponse.json({ data: oData });
-  });
-};
-
 exports.listRelatedBundles = (oRequest, oResponse) => {
   let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
   let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
 
-  oBundleModel
+  oProductModel
     .find({
       _id: { $ne: oRequest.bundle._id },
+      category: null
     })
     .select()
     .sort([[sSortBy, sOrder]])
@@ -71,8 +54,8 @@ exports.listBundles = (oRequest, oResponse) => {
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
 
-  oBundleModel
-    .find()
+  oProductModel
+    .find({category: null})
     .select()
     .sort([[sSortBy, sOrder]])
     .limit(iLimit)
@@ -91,9 +74,9 @@ exports.listBundles = (oRequest, oResponse) => {
  * Get Bundle by id and returns populated product with selected fields only
  */
 exports.bundleById = (oRequest, oResponse, oNext, sId) => {
-  oBundleModel
+  oProductModel
   .findById(sId)
-  .populate('products.product', '_id product_name price image ')
+  .populate('bundle_product.product', '_id product_name price image ')
   .exec((oError, oBundleData) => {
     if (oError || !oBundleData) {
       return oResponse.status(400).json({
@@ -118,9 +101,10 @@ exports.getBundleById = (oRequest, oResponse) => {
  */
 exports.updateBundle = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);
-  oRequest.body.products = JSON.parse(oRequest.body.products);
+  oRequest.body.bundle_product = JSON.parse(oRequest.body.bundle_product);
   _.assignIn(oRequest.bundle, oRequest.body);
-  oBundleModel.findOneAndUpdate(
+
+  oProductModel.findOneAndUpdate(
     { _id: oRequest.bundle._id },
     { $set: oRequest.bundle },
     { new: true },
@@ -136,8 +120,8 @@ exports.updateBundle = (oRequest, oResponse) => {
 };
 
 exports.deleteBundle = (oRequest, oResponse) => {
-  oBundleModel.find({'_id': { $in: oRequest.body }})
-  .select('_id bundle_thumbnail')
+  oProductModel.find({'_id': { $in: oRequest.body }})
+  .select('_id image')
   .exec((oError, oData) => {
       if (oError || oData.length < 1) {
           return oResponse.status(400).json({
@@ -153,7 +137,7 @@ exports.deleteBundle = (oRequest, oResponse) => {
  */
 this.deleteActualBundle = (oRequest, oResponse) => {
   var oBundleId = oRequest.map(oItem => oItem._id);
-  oBundleModel.deleteMany(
+  oProductModel.deleteMany(
       { _id: { $in: oBundleId } },
       (oError, oData) => {
       if (oError) {
@@ -178,7 +162,7 @@ this.deleteActualBundle = (oRequest, oResponse) => {
 this.deleteBundleImage = (oRequest) => {
   var aError = [];
   oRequest.forEach(oItem => {
-      oFileSystem.unlink(`public/images/bundles/${oItem.bundle_thumbnail}`, oError => {
+      oFileSystem.unlink(`public/images/bundles/${oItem.image}`, oError => {
           if (oError) {
               aError.push(oError.message);
           }
@@ -193,8 +177,8 @@ exports.listClientBundle = (oRequest, oResponse) => {
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
 
-  oBundleModel
-    .find({bundle_display: 'T'})
+  oProductModel
+    .find({display: 'T', category: null})
     .select()
     .sort([[sSortBy, sOrder]])
     .limit(iLimit)
