@@ -162,6 +162,7 @@ exports.checkReview = (oRequest, oResponse) => {
 this.createReview = (oRequest, oResponse) => {
     oRequest.body.user = oRequest.profile._id;
     oRequest.body.product = oRequest.product._id;
+    console.log(oRequest.body);
     const oReview = new oReviewModel(oRequest.body);
     oReview.save((oError, oData) => {
         if (oError) {
