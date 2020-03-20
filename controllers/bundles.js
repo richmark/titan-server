@@ -20,31 +20,6 @@ this.setRequestBodyImage = oRequest => {
   return oRequest;
 };
 
-exports.listRelatedBundles = (oRequest, oResponse) => {
-  let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
-  let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
-  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
-  let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
-
-  oProductModel
-    .find({
-      _id: { $ne: oRequest.bundle._id },
-      category: null
-    })
-    .select()
-    .sort([[sSortBy, sOrder]])
-    .limit(iLimit)
-    .skip(iOffset)
-    .exec((oError, oData) => {
-      if (oError) {
-        return oResponse.status(400).json({
-          error: errorHandler(oError)
-        });
-      }
-      oResponse.json({ data: oData });
-    });
-};
-
 /**
  * List Bundles
  */
@@ -171,24 +146,99 @@ this.deleteBundleImage = (oRequest) => {
   return aError;
 };
 
+
+/**
+ * For bundle x category lookup
+ */
+const oReviewLookup = {
+  from: 'reviews',
+  let: { product_id: "$_id"},
+  pipeline: [
+    { $match:
+        { $expr:
+          { $and:
+              [
+                { $eq: [ "$product",  "$$product_id" ] },
+                { $eq: [ "$visibility", true ] }
+              ]
+          }
+        }
+    },
+    { $project: {
+        _id        : 0,
+        rate       : 1
+      } 
+    }
+  ],
+  as: 'reviews'
+};
+
+/**
+ * list Bundle Client function client side
+ * this function returns list of products
+ * this function accepts query parameters (limit, sortBy, order, offset)
+ * include reviews
+ */
 exports.listClientBundle = (oRequest, oResponse) => {
-  let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
+  let oSort = {};
+  let iOrder = parseInt(oRequest.query.order ? oRequest.query.order : 1, 10);
   let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
+  oSort[sSortBy] = iOrder;
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
-
-  oProductModel
-    .find({display: 'T', category: null})
-    .select()
-    .sort([[sSortBy, sOrder]])
-    .limit(iLimit)
-    .skip(iOffset)
-    .exec((oError, oData) => {
+  
+  oProductModel.aggregate([
+    {
+      $match: { category: null }
+    },
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $sort: oSort
+    },
+    { 
+      $skip: iOffset
+    },
+    { 
+      $limit: iLimit
+    }
+  ]).exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: errorHandler(oError)
+          error: "Bundles not found"
         });
       }
-      oResponse.json({ data: oData });
-    });
+      return oResponse.json({ data: aData});
+  });
+};
+
+/**
+ * listRelated bundle function client only
+ * lists products with the same category except the product itself
+ */
+exports.listRelatedBundleClient = (oRequest, oResponse) => {
+  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  oProductModel.aggregate([
+    { 
+      $match : { 
+        _id     : { $ne: oRequest.bundle._id },
+        category: null,
+        display: 'T' 
+      } 
+    },
+    { 
+      $lookup: oReviewLookup,
+    },
+    { 
+      $limit: iLimit
+    }
+  ]).exec((oError, aData) => {
+      if (oError) {
+        return oResponse.status(400).json({
+          error: "Bundles not found"
+        });
+      }
+      return oResponse.json({ data: aData});
+  });
 };
