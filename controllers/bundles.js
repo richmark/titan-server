@@ -33,8 +33,8 @@ exports.listBundles = (oRequest, oResponse) => {
     .find({category: null})
     .select()
     .sort([[sSortBy, sOrder]])
-    .limit(iLimit)
-    .skip(iOffset)
+    // .limit(iLimit)
+    // .skip(iOffset)
     .exec((oError, oData) => {
       if (oError) {
         return oResponse.status(400).json({

@@ -31,7 +31,7 @@ oRouter.post(
 );
 
 oRouter.delete(
-  "/category/:categoryId/:userId",
+  "/category/delete/:userId",
   requireSignin,
   checkAuth,
   checkAdmin,
