@@ -156,6 +156,9 @@ this.checkTransactionOrder = (oData, oRequest, oResponse) => {
     });
 }
 
+/**
+ * Updates coupon and saves user 
+ */
 this.updateCouponFalse = (sCoupon) => {
     if (sCoupon) {
         oCouponModel.findOneAndUpdate(
@@ -168,6 +171,9 @@ this.updateCouponFalse = (sCoupon) => {
     }
 }
 
+/**
+ * Creates order from user after paymaya payment
+ */
 this.insertOrder = (oReq, oRes, oResult) => {
     this.updateCouponFalse(oReq.body.coupon_code);
     var aItems = oResult.items;
