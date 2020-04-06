@@ -20,7 +20,8 @@ const {
   updateReview,
   listReviewsPerProduct,
   getReviewsPerProductCount,
-  reviewById
+  reviewById,
+  deleteReview
 } = require("../controllers/review");
 
 oRouter.post(
@@ -36,6 +37,14 @@ oRouter.put(
   checkAuth,
   checkAdmin,
   updateReview
+);
+
+oRouter.delete(
+  "/review/delete/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  deleteReview
 );
 
 oRouter.get('/reviews/admin/:userId', requireSignin, checkAuth, checkAdmin, listReviewsPerProduct);
