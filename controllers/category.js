@@ -8,6 +8,7 @@
 
 const oCategoryModel = require("../models/category");
 const { errorHandler } = require("../helpers/dbErrorHandler");
+const { _ } = require('lodash');
 
 this.setRequestBodyImage = oRequest => {
   if (typeof oRequest.files !== "undefined") {
@@ -64,16 +65,32 @@ exports.categoryById = (oRequest, oResponse, oNext, sId) => {
  * deletes category
  */
 exports.deleteCategory = (oRequest, oResponse) => {
-  const oCategory = oRequest.category;
-  oCategory.remove(oError => {
-    if (oError) {
-      return oResponse.status(400).json({
-        error: errorHandler(oError)
-      });
-    }
-    oResponse.json({
-      message: "Category deleted!"
-    });
+  oCategoryModel.find({'_id': { $in: oRequest.body }})
+  .select('_id')
+  .exec((oError, oData) => {
+      if (oError || oData.length < 1) {
+          return oResponse.status(400).json({
+              error: "Bundles not found"
+          });
+      }
+      return this.deleteActualCategory(oData, oResponse);
+  });
+};
+
+/**
+ * After checking if IDs are present
+ */
+exports.deleteActualCategory = (oRequest, oResponse) => {
+  var oCategoryId = _.map(oRequest, '_id');
+  oCategoryModel.deleteMany(
+      { _id: { $in: oCategoryId } },
+      (oError, oData) => {
+      if (oError) {
+          return oResponse.status(400).json({
+              error: errorHandler(oError)
+          });
+      }
+      oResponse.json({ data: oData });
   });
 };
 

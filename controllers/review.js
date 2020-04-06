@@ -162,7 +162,6 @@ exports.checkReview = (oRequest, oResponse) => {
 this.createReview = (oRequest, oResponse) => {
     oRequest.body.user = oRequest.profile._id;
     oRequest.body.product = oRequest.product._id;
-    console.log(oRequest.body);
     const oReview = new oReviewModel(oRequest.body);
     oReview.save((oError, oData) => {
         if (oError) {
@@ -231,5 +230,32 @@ exports.reviewById = (oRequest, oResponse, oNext, sId) => {
         }
         oRequest.review = oReview;
         oNext();
+    });
+};
+
+exports.deleteReview = (oRequest, oResponse) => {
+    oReviewModel.find({'product': { $in: oRequest.body }})
+    .select('_id')
+    .exec((oError, oData) => {
+        if (oError || oData.length < 1) {
+            return oResponse.status(400).json({
+                error: "Banners not found"
+            });
+        }
+        return this.deleteActualReview(oData, oResponse);
+    });
+};
+
+exports.deleteActualReview = (oRequest, oResponse) => {
+    var aReviewId = oRequest.map(oItem => oItem._id);
+    oReviewModel.deleteMany(
+        { _id: { $in: aReviewId } },
+        (oError, oData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: errorHandler(oError)
+            });
+        }
+        oResponse.json({ data: oData });
     });
 };
