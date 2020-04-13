@@ -106,11 +106,11 @@ exports.getUser = (oRequest, oResponse) => {
 };
 
 /**
- * Get all verified emails with non admin and non personal role
+ * Get all verified emails with non admin, non personal role and suboperator
  */
 exports.getAllWholesalers = (oRequest, oResponse) => {
   oUserModel
-    .find({ role: { $nin: [1, 2] }, verified_email: { $ne: false } })
+    .find({ role: { $nin: [1, 2, 5] }, verified_email: { $ne: false } })
     .select("company_name verified_admin")
     .exec((oError, oUserData) => {
       if (oError || !oUserData) {
