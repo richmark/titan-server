@@ -30,16 +30,16 @@ exports.createOrder = (oRequest, oResponse) => {
 exports.listOrders = (oRequest, oResponse) => {
     let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
     let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
-    let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
-    let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
+    // let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+    // let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
 
     oOrderModel
         .find()
         .select('_id status createdAt updatedAt')
         .populate('user', '_id email')
         .sort([[sSortBy, sOrder]])
-        .limit(iLimit)
-        .skip(iOffset)
+        // .limit(iLimit)
+        // .skip(iOffset)
         .exec((oError, oData) => {
             if (oError) {
                 return oResponse.status(400).json({
