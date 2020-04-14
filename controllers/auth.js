@@ -113,7 +113,7 @@ exports.checkAuth = (oRequest, oResponse, oNext) => {
  * checks if user has a role of admin (admin = 1, others = 0)
  */
 exports.checkAdmin = (oRequest, oResponse, oNext) => {
-  if (oRequest.profile.role !== 1) {
+  if (oRequest.profile.role !== 1 && oRequest.profile.role !== 5) {
     return oResponse.status(403).json({
       error: "Admin resource! Access Denied!"
     });

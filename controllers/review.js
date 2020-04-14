@@ -143,14 +143,16 @@ exports.getReviewsPerProductCount = (oRequest, oResponse) => {
  * or if ordered product is reviewed
  */
 exports.checkReview = (oRequest, oResponse) => {
+    oRequest.order = JSON.parse(JSON.stringify(oRequest.order));
     const sProductId = JSON.stringify(oRequest.product._id);
     const sIndex = oRequest.order.products.findIndex(oElement => JSON.stringify(oElement.product) === sProductId);
-
+    
     if (sIndex < 0 || oRequest.order.products[sIndex].reviewed === true) {
         return oResponse.status(400).json({
             error: "Error creating review"
         });
     }
+
     oRequest.order.products[sIndex].reviewed = true;
     this.createReview(oRequest, oResponse);
 };
