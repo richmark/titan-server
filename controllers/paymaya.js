@@ -156,11 +156,19 @@ this.checkTransactionOrder = (oData, oRequest, oResponse) => {
     });
 }
 
-this.updateCouponFalse = (sCoupon) => {
-    if (sCoupon) {
+/**
+ * Updates coupon and saves user
+ * Gets user info first and inputs email address 
+ */
+this.updateCouponAndUser = (sCoupon, oUser) => {
+    if (sCoupon && oUser.verified_email === true) {
         oCouponModel.findOneAndUpdate(
             { coupon_code : sCoupon },
-            { $set: { status : false } },
+            { $set: { 
+                status  : false,
+                used_by : oUser.email 
+              } 
+            },
             (oError, oData) => {
                 
             }
@@ -168,8 +176,11 @@ this.updateCouponFalse = (sCoupon) => {
     }
 }
 
+/**
+ * Creates order from user after paymaya payment
+ */
 this.insertOrder = (oReq, oRes, oResult) => {
-    this.updateCouponFalse(oReq.body.coupon_code);
+    this.updateCouponAndUser(oReq.body.coupon_code, oReq.profile);
     var aItems = oResult.items;
     var oOrder = {
         user: oReq.profile._id,
