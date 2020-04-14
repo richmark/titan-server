@@ -43,7 +43,7 @@ oRouter.put(
 );
 
 oRouter.delete(
-  "/product/:productId/:userId",
+  "/product/delete/:userId",
   requireSignin,
   checkAuth,
   checkAdmin,

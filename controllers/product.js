@@ -16,10 +16,10 @@ const oFileSystem = require("fs");
 /**
  * sets product image
  */
-this.setRequestBodyImage = oRequest => {
+this.setRequestBodyImage = (oRequest) => {
   if (typeof oRequest.files !== "undefined") {
     var aAdditionalImages = [];
-    Object.keys(oRequest.files).forEach(sKey => {
+    Object.keys(oRequest.files).forEach((sKey) => {
       if (sKey === "additional_images") {
         for (var iIndex in oRequest.files[sKey]) {
           aAdditionalImages.push(oRequest.files[sKey][iIndex].filename);
@@ -51,7 +51,7 @@ exports.registerProduct = (oRequest, oResponse) => {
   oProduct.save((oError, oData) => {
     if (oError) {
       return oResponse.status(400).json({
-        error: errorHandler(oError)
+        error: errorHandler(oError),
       });
     }
     oResponse.json({ data: oData });
@@ -66,20 +66,20 @@ exports.registerProduct = (oRequest, oResponse) => {
 exports.listProducts = (oRequest, oResponse) => {
   let sOrder = oRequest.query.order ? oRequest.query.order : "asc";
   let sSortBy = oRequest.query.sortBy ? oRequest.query.sortBy : "_id";
-  let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
-  let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
+  // let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+  // let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
 
   oProductModel
-    .find({category: {$ne: null} })
+    .find({ category: { $ne: null } })
     .populate("category")
     .select()
     .sort([[sSortBy, sOrder]])
-    .limit(iLimit)
-    .skip(iOffset)
+    // .limit(iLimit)
+    // .skip(iOffset)
     .exec((oError, oData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
       oResponse.json({ data: oData });
@@ -94,7 +94,7 @@ exports.countProducts = (oRequest, oResponse) => {
   oProductModel.countDocuments().exec((oError, iCount) => {
     if (oError) {
       return oResponse.status(400).json({
-        error: "Something went wrong!"
+        error: "Something went wrong!",
       });
     }
 
@@ -110,7 +110,7 @@ exports.productById = (oRequest, oResponse, oNext, sId) => {
   oProductModel.findById(sId).exec((oError, oProduct) => {
     if (oError || !oProduct) {
       return oResponse.status(400).json({
-        error: "Product not found"
+        error: "Product not found",
       });
     }
     oRequest.product = oProduct;
@@ -142,7 +142,7 @@ exports.listBySearch = (oRequest, oResponse) => {
       if (key === "price") {
         findArgs[key] = {
           $gte: oRequest.body.filters[key][0],
-          $lte: oRequest.body.filters[key][1]
+          $lte: oRequest.body.filters[key][1],
         };
       } else {
         findArgs[key] = oRequest.body.filters[key];
@@ -160,14 +160,14 @@ exports.listBySearch = (oRequest, oResponse) => {
     .exec((err, oProduct) => {
       if (err) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
       oResponse.json({
         data: {
           size: oProduct.length,
-          oProduct
-        }
+          oProduct,
+        },
       });
     });
 };
@@ -182,14 +182,14 @@ exports.listRelated = (oRequest, oResponse) => {
   oProductModel
     .find({
       _id: { $ne: oRequest.product },
-      category: oRequest.product.category
+      category: oRequest.product.category,
     })
     .limit(iLimit)
     .populate("category", "_id name")
     .exec((oError, oProduct) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
       oResponse.json({ data: oProduct });
@@ -204,7 +204,7 @@ exports.listCategories = (oRequest, oResponse) => {
   oProductModel.distinct("category", {}, (oError, oCategories) => {
     if (oError) {
       return oResponse.status(400).json({
-        error: "Categories not found"
+        error: "Categories not found",
       });
     }
     oResponse.json({ data: oCategories });
@@ -227,7 +227,7 @@ exports.updateProduct = (oRequest, oResponse) => {
     (oError, oData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: errorHandler(oError)
+          error: errorHandler(oError),
         });
       }
       var aError = this.deleteUnusedImage(oRequest);
@@ -241,7 +241,7 @@ exports.updateProduct = (oRequest, oResponse) => {
   );
 };
 
-this.deleteUnusedImage = oRequest => {
+this.deleteUnusedImage = (oRequest) => {
   if (
     oRequest.body.additional_images &&
     oRequest.body.additional_images.length <
@@ -252,8 +252,8 @@ this.deleteUnusedImage = oRequest => {
       oRequest.body.additional_images
     );
     const aError = [];
-    aDeleteImages.forEach(sFile => {
-      oFileSystem.unlink(`public/images/products/${sFile}`, oError => {
+    aDeleteImages.forEach((sFile) => {
+      oFileSystem.unlink(`public/images/products/${sFile}`, (oError) => {
         if (oError) {
           aError.push(oError.message);
         }
@@ -269,17 +269,66 @@ this.deleteUnusedImage = oRequest => {
  * this function deletes product by id
  */
 exports.deleteProduct = (oRequest, oResponse) => {
-  let oProduct = oRequest.product;
-  oProduct.remove(oError => {
+  oProductModel
+    .find({ _id: { $in: oRequest.body } })
+    .select("_id additional_images image")
+    .exec((oError, oData) => {
+      if (oError || oData.length < 1) {
+        return oResponse.status(400).json({
+          error: "Products not found",
+        });
+      }
+      return this.deleteActualProduct(oData, oResponse);
+    });
+};
+
+/**
+ * Delete actual product
+ */
+this.deleteActualProduct = (oRequest, oResponse) => {
+  var aProductId = oRequest.map((oItem) => oItem._id);
+  oProductModel.deleteMany({ _id: { $in: aProductId } }, (oError, oData) => {
     if (oError) {
       return oResponse.status(400).json({
-        error: errorHandler(oError)
+        error: errorHandler(oError),
       });
     }
-    oResponse.json({
-      message: "Product deleted successfully!"
+
+    var aError = this.deleteProductImage(oRequest);
+
+    if (aError.length > 0) {
+      return oResponse.status(400).json({ error: "Error in deleting images" }); // refactor, delete first before updating
+    }
+
+    oResponse.json({ data: oData });
+  });
+};
+
+/**
+ * Retrieved product data from find function returns with image file name
+ * Image file name would be also deleted
+ */
+this.deleteProductImage = (oRequest) => {
+  var aError = [];
+  oRequest.forEach((oItem) => {
+    if (oItem.additional_images.length > 0) {
+      oItem.additional_images.forEach((oAdditionalImage) => {
+        oFileSystem.unlink(`public/images/products/${oAdditionalImage}`, (oError) => {
+          if (oError) {
+            aError.push(oError.message);
+          }
+        });
+      });
+    }
+
+    oFileSystem.unlink(`public/images/products/${oItem.image}`, (oError) => {
+      if (oError) {
+        aError.push(oError.message);
+      }
     });
   });
+
+  return aError;
 };
 
 exports.listByCategory = (oRequest, oResponse) => {
@@ -289,7 +338,7 @@ exports.listByCategory = (oRequest, oResponse) => {
 
   oProductModel
     .find({
-      category: oRequest.category._id
+      category: oRequest.category._id,
     })
     .limit(iLimit)
     .populate("category", "_id name")
@@ -298,7 +347,7 @@ exports.listByCategory = (oRequest, oResponse) => {
     .exec((oError, data) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
       oResponse.json({ size: data.length, data });
@@ -315,18 +364,18 @@ exports.productSearch = (oRequest, oResponse) => {
     .find({
       $or: [
         {
-          product_name: { $regex: new RegExp(queryString, "i") }
+          product_name: { $regex: new RegExp(queryString, "i") },
         },
         {
-          description: { $regex: new RegExp(queryString, "i") }
-        }
-      ]
+          description: { $regex: new RegExp(queryString, "i") },
+        },
+      ],
     })
     .populate("category", "_id name")
     .exec((oError, oProduct) => {
       if (oError || !oProduct) {
         return oResponse.status(400).json({
-          error: "Product does not exist!"
+          error: "Product does not exist!",
         });
       }
       oResponse.json({ data: oProduct });
@@ -337,36 +386,37 @@ exports.productSearch = (oRequest, oResponse) => {
  * For product x category lookup
  */
 const oReviewLookup = {
-  from: 'reviews',
-  let: { product_id: "$_id"},
+  from: "reviews",
+  let: { product_id: "$_id" },
   pipeline: [
-    { $match:
-        { $expr:
-          { $and:
-              [
-                { $eq: [ "$product",  "$$product_id" ] },
-                { $eq: [ "$visibility", true ] }
-              ]
-          }
-        }
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $eq: ["$product", "$$product_id"] },
+            { $eq: ["$visibility", true] },
+          ],
+        },
+      },
     },
-    { $project: {
-        _id        : 0,
-        rate       : 1
-      } 
-    }
+    {
+      $project: {
+        _id: 0,
+        rate: 1,
+      },
+    },
   ],
-  as: 'reviews'
+  as: "reviews",
 };
 
 /**
  * For product x category lookup
  */
 const oCategoryLookup = {
-  from: 'categories',
-  localField: 'category',
-  foreignField: '_id',
-  as: 'category'
+  from: "categories",
+  localField: "category",
+  foreignField: "_id",
+  as: "category",
 };
 
 /**
@@ -375,30 +425,32 @@ const oCategoryLookup = {
  */
 exports.listRelatedClient = (oRequest, oResponse) => {
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
-  oProductModel.aggregate([
-    { 
-      $match : { 
-        _id     : { $ne: oRequest.product._id },
-        category: oRequest.product.category 
-      } 
-    },
-    { 
-      $lookup: oReviewLookup,
-    },
-    { 
-      $lookup: oCategoryLookup
-    },
-    { 
-      $limit: iLimit
-    }
-  ]).exec((oError, aData) => {
+  oProductModel
+    .aggregate([
+      {
+        $match: {
+          _id: { $ne: oRequest.product._id },
+          category: oRequest.product.category,
+        },
+      },
+      {
+        $lookup: oReviewLookup,
+      },
+      {
+        $lookup: oCategoryLookup,
+      },
+      {
+        $limit: iLimit,
+      },
+    ])
+    .exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
-      return oResponse.json({ data: aData});
-  });
+      return oResponse.json({ data: aData });
+    });
 };
 
 /**
@@ -414,34 +466,36 @@ exports.listProductsClient = (oRequest, oResponse) => {
   oSort[sSortBy] = iOrder;
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
-  
-  oProductModel.aggregate([
-    {
-      $match: { category: {$ne: null} }
-    },
-    { 
-      $lookup: oReviewLookup,
-    },
-    { 
-      $lookup: oCategoryLookup,
-    },
-    { 
-      $sort: oSort
-    },
-    { 
-      $skip: iOffset
-    },
-    { 
-      $limit: iLimit
-    }
-  ]).exec((oError, aData) => {
+
+  oProductModel
+    .aggregate([
+      {
+        $match: { category: { $ne: null } },
+      },
+      {
+        $lookup: oReviewLookup,
+      },
+      {
+        $lookup: oCategoryLookup,
+      },
+      {
+        $sort: oSort,
+      },
+      {
+        $skip: iOffset,
+      },
+      {
+        $limit: iLimit,
+      },
+    ])
+    .exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
-      return oResponse.json({ data: aData});
-  });
+      return oResponse.json({ data: aData });
+    });
 };
 
 /**
@@ -450,33 +504,35 @@ exports.listProductsClient = (oRequest, oResponse) => {
  */
 exports.productSearchClient = (oRequest, oResponse) => {
   let queryString = oRequest.body.query;
-  oProductModel.aggregate([
-    { 
-      $match : { 
-        $or: [
-          {
-            product_name: { $regex: new RegExp(queryString, "i") }
-          },
-          {
-            description: { $regex: new RegExp(queryString, "i") }
-          }
-        ]
-      } 
-    },
-    { 
-      $lookup: oReviewLookup,
-    },
-    { 
-      $lookup: oCategoryLookup
-    },
-  ]).exec((oError, aData) => {
+  oProductModel
+    .aggregate([
+      {
+        $match: {
+          $or: [
+            {
+              product_name: { $regex: new RegExp(queryString, "i") },
+            },
+            {
+              description: { $regex: new RegExp(queryString, "i") },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: oReviewLookup,
+      },
+      {
+        $lookup: oCategoryLookup,
+      },
+    ])
+    .exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
-      return oResponse.json({ data: aData});
-  });
+      return oResponse.json({ data: aData });
+    });
 };
 
 /**
@@ -486,35 +542,37 @@ exports.listByCategoryClient = (oRequest, oResponse) => {
   var oSort = {};
   let iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
   let iOrder = parseInt(oRequest.query.order ? oRequest.query.order : -1, 10);
-  oSort['_id'] = iOrder;
+  oSort["_id"] = iOrder;
   let iSkip = parseInt(oRequest.query.skip);
-  oProductModel.aggregate([
-    { 
-      $match : { 
-        category: oRequest.category._id
-      } 
-    },
-    { 
-      $lookup: oReviewLookup,
-    },
-    { 
-      $lookup: oCategoryLookup
-    },
-    { 
-      $sort: oSort
-    },
-    { 
-      $skip: iSkip
-    },
-    { 
-      $limit: iLimit
-    },
-  ]).exec((oError, aData) => {
+  oProductModel
+    .aggregate([
+      {
+        $match: {
+          category: oRequest.category._id,
+        },
+      },
+      {
+        $lookup: oReviewLookup,
+      },
+      {
+        $lookup: oCategoryLookup,
+      },
+      {
+        $sort: oSort,
+      },
+      {
+        $skip: iSkip,
+      },
+      {
+        $limit: iLimit,
+      },
+    ])
+    .exec((oError, aData) => {
       if (oError) {
         return oResponse.status(400).json({
-          error: "Products not found"
+          error: "Products not found",
         });
       }
-      return oResponse.json({ data: aData});
-  });
+      return oResponse.json({ data: aData });
+    });
 };
