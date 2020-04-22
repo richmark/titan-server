@@ -23,11 +23,12 @@ const {
   wholesalerById,
   getWholesaler,
   updateWholesaler,
-  deleteUser
+  deleteUser,
+  getAllUsers
 } = require("../controllers/user");
 
 /**
- * TODO: add proper middlewares
+ * Get wholesaler by id
  */
 oRouter.get(
   "/users/:userId/wholesaler/:wholesalerId",
@@ -36,6 +37,10 @@ oRouter.get(
   checkAdmin,
   getWholesaler
 );
+
+/**
+ * Update wholesaler by id
+ */
 oRouter.put(
   "/users/:userId/wholesaler/:wholesalerId",
   requireSignin,
@@ -43,6 +48,10 @@ oRouter.put(
   checkAdmin,
   updateWholesaler
 );
+
+/**
+ * Get all wholesalers (admin)
+ */
 oRouter.get(
   "/users/:userId",
   requireSignin,
@@ -50,6 +59,21 @@ oRouter.get(
   checkAdmin,
   getAllWholesalers
 );
+
+/**
+ * Get all registered users with verified email (admin)
+ */
+oRouter.get(
+  "/users/all/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  getAllUsers
+);
+
+/**
+ * Get all subadmins (admin)
+ */
 oRouter.get(
   "/users/subadmins/:userId",
   requireSignin,
@@ -58,17 +82,40 @@ oRouter.get(
   getAllSubadmins
 );
 
+/**
+ * Get User by Id
+ */
 oRouter.get("/user/:userId", requireSignin, checkAuth, getUser);
+
+/**
+ * Update User Password
+ */
 oRouter.put(
   "/user/password/:userId",
   requireSignin,
   checkAuth,
   updateUserPassword
 );
+
+/**
+ * Update User Password with Image
+ */
 oRouter.put("/user/:userId", requireSignin, uploadImage, updateUser);
+
+/**
+ * User Id Middleware Checker
+ */
 oRouter.param("userId", userById);
+
+/**
+ * Wholesaler Middleware Checker
+ */
 oRouter.param("wholesalerId", wholesalerById);
 
+/**
+ * Delete User
+ */
 oRouter.delete("/user/:userId", requireSignin, deleteUser);
+
 
 module.exports = oRouter;
