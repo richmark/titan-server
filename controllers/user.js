@@ -137,7 +137,7 @@ exports.getAllWholesalers = (oRequest, oResponse) => {
 exports.getAllUsers = (oRequest, oResponse) => {
   oUserModel
     .find({
-      role: { $nin: [1, 2, 5] }, 
+      role: { $nin: [1, 5] }, 
       verified_email: { $ne: false } 
     })
     .select()
