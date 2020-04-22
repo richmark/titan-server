@@ -71,6 +71,9 @@ this.changeUserPassword = async (oRequest, oResponse) => {
     .send({ message: "Successfully changed your password." });
 };
 
+/**
+ * Update User
+ */
 exports.updateUser = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);
   oUserModel.findOneAndUpdate(
@@ -98,6 +101,10 @@ exports.updateUser = (oRequest, oResponse) => {
   );
 };
 
+/**
+ * Get User
+ * Removes Password and Salt data
+ */
 exports.getUser = (oRequest, oResponse) => {
   oRequest.profile.hashed_password = undefined;
   oRequest.profile.salt = undefined;
@@ -112,6 +119,28 @@ exports.getAllWholesalers = (oRequest, oResponse) => {
   oUserModel
     .find({ role: { $nin: [1, 2, 5] }, verified_email: { $ne: false } })
     .select("company_name verified_admin")
+    .exec((oError, oUserData) => {
+      if (oError || !oUserData) {
+        return oResponse.status(400).json({
+          error: "User not found"
+        });
+      }
+      return oResponse.status(200).json({
+        data: oUserData
+      });
+    });
+};
+
+/**
+ * Get all users verified emails
+ */
+exports.getAllUsers = (oRequest, oResponse) => {
+  oUserModel
+    .find({
+      role: { $nin: [1, 2, 5] }, 
+      verified_email: { $ne: false } 
+    })
+    .select()
     .exec((oError, oUserData) => {
       if (oError || !oUserData) {
         return oResponse.status(400).json({
@@ -164,12 +193,18 @@ exports.wholesalerById = (oRequest, oResponse, oNext, sId) => {
     });
 };
 
+/**
+ * Get Whole Saler
+ */
 exports.getWholesaler = (oRequest, oResponse) => {
   return oResponse.status(200).json({
     data: oRequest.wholesaler
   });
 };
 
+/**
+ * Update Whole Saler
+ */
 exports.updateWholesaler = (oRequest, oResponse) => {
   oUserModel.findOneAndUpdate(
     {
@@ -197,7 +232,7 @@ exports.updateWholesaler = (oRequest, oResponse) => {
 };
 
 /**
- * deleteCoupon function
+ * Delete User
  * deletes coupon
  */
 exports.deleteUser = (oRequest, oResponse) => {
