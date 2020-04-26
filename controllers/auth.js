@@ -144,14 +144,8 @@ this.createVerificationToken = async (oUserData, oResponse) => {
   const oData = {
     email: oUserData.email,
     subject: "Titan Supertools Account Verification",
-    text:
-      "Hello,\n\n" +
-      "Please verify your account by clicking the link: \n\n" +
-      FRONT_DOMAIN +
-      "/verify/" +
-      oToken.token +
-      ".\n",
-    html: "",
+    text: "",
+    html: `<p>Please verify your account by clicking the <a href="${FRONT_DOMAIN}/verify/${oToken.token}">link</a></p>`,
     response: "A verification email has been sent to " + oUserData.email + "."
   };
 
@@ -242,8 +236,12 @@ exports.forgotPassword = async (oRequest, oResponse) => {
   const oData = {
     email: oUser.email,
     subject: "Titan Supertools Password Reset",
-    text: `Forgot your password Submit a PATCH request with your new password and passwordConfirm to ${resetURL}.\nIf you didin't forget your password, please ignore this email.`,
-    html: ""
+    text: "",
+    html: `
+      <p>Hi, ${oUser.email}</p>
+      <p>Please visit this <a href=${resetURL}>link</a> in order for you to reset your password.</p>
+      <p>If you didin't forget your password, please ignore this email.</p>
+    `
   };
 
   // Send the email
