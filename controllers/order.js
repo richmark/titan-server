@@ -2,12 +2,14 @@
  * Titan Ecommerce (Server)
  * controllers/order.js
  * @author Richmark Jinn Ravina <richmark.jinn.ravina@gmail.com>
+ * @author Carlo Barcena <cbarcena20@gmail.com>
  * @date 12/07/2019
  * @version 1.0
  */
 
 const oOrderModel = require("../models/order");
 const oProductModel = require("../models/product");
+const oSettingModel = require("../models/settings");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 const { _ } = require('lodash');
 
@@ -165,3 +167,73 @@ this.setQuery = (oData) => {
         $push: { history: oHistory } // push a history for every update of an order 
     };
 }
+
+/**
+ * Create or Update Order Details  
+ * this function create or update order settings
+ * Delivery Fee
+ */
+exports.createOrderSettings = (oRequest, oResponse) => {
+    const oOrder = new oSettingModel(oRequest.body);
+    oOrder.save((oError, oData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: errorHandler(oError)
+            });
+        }
+        oResponse.json({ data: oData });
+    });
+};
+
+/**
+ * Get Order Settings
+ * Gets Delivery Fee
+ */
+exports.getOrderSettings = (oRequest, oResponse) => {
+    oSettingModel
+        .find()
+        .select()
+        .exec((oError, oData) => {
+            if (oError) {
+                return oResponse.status(400).json({
+                    error: "Settings not found"
+                });
+            }
+            oResponse.json({ data: oData });
+        });
+};
+
+/**
+ * Update Order Settings by Id
+ * Status and History
+ */
+exports.updateOrderSettings = (oRequest, oResponse) => {
+    oSettingModel.findOneAndUpdate(
+        { _id: oRequest.setting._id },
+        { $set: oRequest.body },
+        { new: true },
+        (oError, oData) => {
+          if (oError) {
+            return oResponse.status(400).json({
+              error: errorHandler(oError)
+            });
+          }
+          oResponse.json({ data: oData });
+        }
+    );
+};
+
+/**
+ * Find Setting By Id
+ */
+exports.settingById = (oRequest, oResponse, oNext, sId) => {
+    oSettingModel.findById(sId).exec((oError, oSetting) => {
+      if (oError || !oSetting) {
+        oResponse.status(400).json({
+          error: "Setting not found"
+        });
+      }
+      oRequest.setting = oSetting;
+      oNext();
+    });
+};

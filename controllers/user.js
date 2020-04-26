@@ -118,7 +118,7 @@ exports.getUser = (oRequest, oResponse) => {
 exports.getAllWholesalers = (oRequest, oResponse) => {
   oUserModel
     .find({ role: { $nin: [1, 2, 5] }, verified_email: { $ne: false } })
-    .select("company_name verified_admin")
+    .select("company_name verified_admin role")
     .exec((oError, oUserData) => {
       if (oError || !oUserData) {
         return oResponse.status(400).json({
