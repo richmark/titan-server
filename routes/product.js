@@ -59,6 +59,17 @@ oRouter.get("/products/related/:productId", listRelated);
 oRouter.get("/products/categories", listCategories);
 oRouter.get("/products/category/:categoryId", listByCategory);
 
+/**
+ * For Script Automation
+ */
+oRouter.post(
+  "/automate/product/create/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  registerProduct
+);
+
 // Client Side Route
 oRouter.get("/products/client/:productId", listRelatedClient);
 oRouter.get("/products/client", listProductsClient);
