@@ -50,6 +50,14 @@ oRouter.put(
 oRouter.get("/category", listCategory);
 oRouter.get("/category/:categoryId", getCategory);
 
+oRouter.post(
+  "/automate/category/create/:userId",
+  requireSignin,
+  checkAuth,
+  checkAdmin,
+  createCategory
+);
+
 oRouter.param("userId", userById);
 oRouter.param("categoryId", categoryById);
 
