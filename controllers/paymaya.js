@@ -206,6 +206,10 @@ this.insertOrder = (oReq, oRes, oResult) => {
 }
 
 this.createOrder = (oCreate , oResponse) => {
+    oCreate.history = {
+        status: 'Not Processed', 
+        note: 'Order created'
+    };
     const oOrder = new oOrderModel(oCreate);
     oOrder.save((oError, oData) => {
         if (oError) {
