@@ -105,7 +105,7 @@ const oOrderSchema = new oMongoose.Schema(
             {
                 status: 'Not Processed',
                 note: 'Order created',
-                process_time: Date.now()
+                process_time: Date.now
             }
         ]
     },
