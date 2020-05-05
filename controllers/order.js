@@ -37,7 +37,7 @@ exports.listOrders = (oRequest, oResponse) => {
 
     oOrderModel
         .find()
-        .select('_id status createdAt updatedAt')
+        .select('_id status createdAt updatedAt reference_number')
         .populate('user', '_id email')
         .sort([[sSortBy, sOrder]])
         // .limit(iLimit)
