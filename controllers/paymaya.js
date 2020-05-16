@@ -46,7 +46,10 @@ exports.implementWebhook = (oReq, oRes) => {
     if (bIp === true) {
         return oRes.status(403).json({
             data: 'Invalid Request. Not Authorized!',
-            ip_address: ip 
+            ip_address_1: ip,
+            ip_address_2: oReq.connection.remoteAddress,
+            ip_address_3: oReq.socket.remoteAddress,
+            ip_address_4: oReq.connection.socket.remoteAddress,
         });
     }
     if (!oReq.body) {
