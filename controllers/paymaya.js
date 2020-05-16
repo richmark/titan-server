@@ -3,6 +3,7 @@ const oCouponModel = require("../models/coupon");
 const oProductModel = require('../models/product');
 const oPaymayaModel = require('../models/paymaya');
 const oOrderModel = require('../models/order');
+const { errorHandler } = require("../helpers/dbErrorHandler");
 const oUuidv1 = require("uuid/v1");
 const oSdk = require('paymaya-node-sdk');
 const { FRONT_DOMAIN } = require("../config");
@@ -10,12 +11,156 @@ const oPaymaya = oSdk.PaymayaSDK;
 const oCheckout = oSdk.Checkout;
 require('dotenv').config();
 
+/**
+ * Set to production if using production keys
+ * Currently set to SANDBOX environment
+ */
 oPaymaya.initCheckout(
     process.env.PAYMAYA_PUBLIC_KEY,
     process.env.PAYMAYA_SECRET_KEY,
     oPaymaya.ENVIRONMENT.SANDBOX
 );
 
+/**
+ * Paymaya WhiteList Servers
+ */
+const aPaymayaWhitelist = [
+    '13.229.160.234',
+    '3.1.199.75',
+    '18.138.50.235',
+    '3.1.207.200',
+    '52.76.121.68'
+];
+
+/**
+ * Paymaya Webhook
+ * (Success, Fail, Dropout)
+ * Record our not update during fail and dropout
+ */
+exports.implementWebhook = (oReq, oRes) => {
+    var ip = (oReq.headers['x-forwarded-for'] || '').split(',').pop().trim() || 
+        oReq.connection.remoteAddress || 
+        oReq.socket.remoteAddress || 
+        oReq.connection.socket.remoteAddress;
+    var bIp = aPaymayaWhitelist.indexOf(ip) === -1;
+    if (bIp === true) {
+        return oRes.status(403).json({
+            data: 'Invalid Request. Not Authorized!'
+        });
+    }
+    if (!oReq.body) {
+        return oRes.status(400).json({
+            data: 'Invalid Request. No Payload!'
+        });
+    }
+    if (oReq.body.status === 'PAYMENT_FAILED' || oReq.body.status === 'PAYMENT_EXPIRED') {
+        return oRes.status(200).json({
+            data: 'Records Updated'
+        });
+    }
+    return this.checkReferenceNumberOrderModel(oReq, oRes);
+}
+
+/**
+ * Checks if reference number already exists in order database
+ */
+this.checkReferenceNumberOrderModel = (oReq, oRes) => {
+    var oWebhook = oReq.body;
+    var oBody = {
+        reference_number : oWebhook.requestReferenceNumber
+    };
+    oOrderModel.find(oBody).exec((oError, aData) => {
+        if (oError || aData.length === 0) {
+            return this.checkReferenceNumberPaymayaModel(oReq, oRes, oBody);
+        }
+        return oRes.status(202).json({
+            data: 'Transaction already updated'
+        });
+    });
+};
+
+/**
+ * Checks if reference number exists in paymaya database
+ */
+this.checkReferenceNumberPaymayaModel = (oReq, oRes, oBody) => {
+    var oPaymayaData = {
+        referenceId : oBody.reference_number
+    };
+    oPaymayaModel.find(oPaymayaData).exec((oError, aData) => {
+        if (oError || aData.length === 0) {
+            return oRes.status(204).json({
+                data: 'Transaction not found'
+            });
+        }
+        return this.updateTransactionOrder(aData[0], oReq, oRes);
+    });
+}
+
+/**
+ * Checks paymaya data vs initial data
+ */
+this.updateTransactionOrder = (oData, oReq, oRes) => {
+    var checkout = new oCheckout();
+    checkout.id = oData.checkoutId;
+    checkout.retrieve((oErrorCheckout, oResult) => {
+        if (oErrorCheckout) {
+            return oRes.status(400).json({
+                error: oErrorCheckout
+            });
+        }
+        if (oResult.paymentStatus === 'PAYMENT_SUCCESS') {
+            return this.getUserDataWebhook(oReq, oRes, oResult, oData);
+        }
+        
+        return oRes.status(400).json({
+            error: 'payment status must be success'
+        });
+    });
+}
+
+/**
+ * Gets User Data for webhook
+ */
+this.getUserDataWebhook = (oRequest, oResponse, oResult, oData) => {
+    oUserModel.findById(oData.userId).exec((oError, oUserData) => {
+        if (oError || !oUserData) {
+          return oResponse.status(400).json({
+            error: "User does not exist"
+          });
+        }
+        oRequest.profile = oUserData;
+        return this.insertOrderWebhook(oRequest, oResponse, oResult, oData);
+    });
+}
+
+/**
+ * Creates order from user after paymaya successful payment (webhook)
+ */
+this.insertOrderWebhook = (oReq, oRes, oResult, oData) => {
+    this.updateCouponAndUser(oData.coupon_code, oReq.profile);
+    var aItems = oResult.items;
+    var oOrder = {
+        user: oReq.profile._id,
+        billing: oData.billing,
+        shipping: oData.shipping, 
+        transaction_id: oResult.paymentDetails.responses.efs.receipt.transactionId,
+        amount: oResult.totalAmount.amount,
+        discount_fee: oResult.totalAmount.details.discount,
+        shipping_fee: oResult.totalAmount.details.shippingFee,
+        reference_number: oResult.requestReferenceNumber,
+        products: []
+    }
+    aItems.map((oItem, iIndex) => {
+        var oSingleProduct = {
+            product: oItem.code,
+            price: parseInt(oItem.amount.value, 10),
+            count: parseInt(oItem.quantity, 10)
+        };
+        oOrder.products.push(oSingleProduct); 
+    });
+    this.decreaseQuantity(oOrder.products);
+    return this.createOrder(oOrder, oRes);
+}
 
 exports.initiateCheckout = (oReq, oRes) => {
     const sRequestId = oUuidv1();
@@ -90,12 +235,15 @@ exports.initiateCheckout = (oReq, oRes) => {
             const oModel = {
                 'referenceId' : sRequestId,
                 'checkoutId'  : response.checkoutId,
-                'userId'      : oReq.profile._id
+                'userId'      : oReq.profile._id,
+                'coupon_code' : oReq.body.coupon_code,
+                'billing'     : JSON.parse(Buffer.from(oReq.body.billing, 'base64').toString()),
+                'shipping'    : JSON.parse(Buffer.from(oReq.body.shipping, 'base64').toString())
             };
             const oCreate = new oPaymayaModel(oModel);
             oCreate.save((oError, oData) => {
                 if (oError) {
-                    return oResponse.status(400).json({
+                    return oRes.status(400).json({
                         error: errorHandler(oError)
                     });
                 }
@@ -175,7 +323,6 @@ this.updateCouponAndUser = (sCoupon, oUser) => {
         )
     }
 }
-
 /**
  * Creates order from user after paymaya payment
  */
@@ -204,6 +351,7 @@ this.insertOrder = (oReq, oRes, oResult) => {
     this.decreaseQuantity(oOrder.products);
     return this.createOrder(oOrder, oRes);
 }
+
 
 this.createOrder = (oCreate , oResponse) => {
     oCreate.history = {

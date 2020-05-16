@@ -8,6 +8,24 @@
 
 const oMongoose = require("mongoose");
 
+const oOrderedDetailsSchema = new oMongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true
+        },
+        address: {
+            type: String,
+            required: true
+        },
+        contact: {
+            type: String,
+            default: false
+        }
+    },
+    { _id : false }
+);
+
 const oPaymayaSchema = new oMongoose.Schema(
     {
         checkoutId: {
@@ -22,10 +40,23 @@ const oPaymayaSchema = new oMongoose.Schema(
             type: String,
             required: true
         },
+        billing: {
+            type: [oOrderedDetailsSchema],
+            required: true
+        },
+        shipping: {
+            type: [oOrderedDetailsSchema],
+            required: true
+        },
+        coupon_code: {
+            type: String,
+            trim: true,
+            maxLength: 24,
+        },
         createdAt: {
             type: Date,
             default: Date.now,
-            expires: '60m'
+            expires: '120m'
         }
     },
     { timestamps: true }
