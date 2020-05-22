@@ -470,7 +470,10 @@ exports.listProductsClient = (oRequest, oResponse) => {
   oProductModel
     .aggregate([
       {
-        $match: { category: { $ne: null } },
+        $match: { 
+          category: { $ne: null },
+          display: 'T' 
+        },
       },
       {
         $lookup: oReviewLookup,
