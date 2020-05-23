@@ -511,6 +511,7 @@ exports.productSearchClient = (oRequest, oResponse) => {
     .aggregate([
       {
         $match: {
+          display: 'T', 
           $or: [
             {
               product_name: { $regex: new RegExp(queryString, "i") },
@@ -552,6 +553,7 @@ exports.listByCategoryClient = (oRequest, oResponse) => {
       {
         $match: {
           category: oRequest.category._id,
+          display: 'T' 
         },
       },
       {
