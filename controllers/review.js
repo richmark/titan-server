@@ -83,7 +83,7 @@ exports.listReviewsClient = (oRequest, oResponse) => {
     .find(oArgs)
     .limit(iLimit)
     .populate("user", "-_id first_name last_name") // id or email
-    .sort([['_id', sOrder]])
+    .sort([['createdAt', sOrder]])
     .skip(iOffset)
     .exec((oError, oData) => {
         if (oError) {
