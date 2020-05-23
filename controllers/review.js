@@ -35,9 +35,40 @@ exports.listReviewsCount = (oRequest, oResponse) => {
  * filter by productId
  */
 exports.listReviews = (oRequest, oResponse) => {
-    const iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
     const sOrder = oRequest.query.order ? oRequest.query.order : 'desc';
-    const skip = parseInt(oRequest.query.skip);
+
+    var oArgs = {};
+
+    if (oRequest.product) {
+        oArgs = { product: oRequest.product._id };
+    }
+
+    if (oRequest.query.visibility) {
+        oArgs['visibility'] = true;
+    }
+
+    oReviewModel
+    .find(oArgs)
+    .populate("user", "-_id first_name last_name") // id or email
+    .sort([['_id', sOrder]])
+    .exec((oError, oData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: errorHandler(oError)
+            });
+        }
+        oResponse.json({ data: oData });
+    });
+};
+
+/**
+ * List Reviews with limit and offset parameters
+ */
+exports.listReviewsClient = (oRequest, oResponse) => {
+    const iLimit = oRequest.query.limit ? parseInt(oRequest.query.limit, 10) : 6;
+    const iOffset = oRequest.query.offset ? parseInt(oRequest.query.offset, 10) : 0;
+    const sOrder = oRequest.query.order ? oRequest.query.order : 'desc';
+
     var oArgs = {};
 
     if (oRequest.product) {
@@ -53,7 +84,7 @@ exports.listReviews = (oRequest, oResponse) => {
     .limit(iLimit)
     .populate("user", "-_id first_name last_name") // id or email
     .sort([['_id', sOrder]])
-    .skip(skip)
+    .skip(iOffset)
     .exec((oError, oData) => {
         if (oError) {
             return oResponse.status(400).json({

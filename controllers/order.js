@@ -94,7 +94,7 @@ exports.getOrderById = (oRequest, oResponse) => {
         }
         var oOrder = JSON.parse(JSON.stringify(oRequest.order));
         var oClonedData = JSON.parse(JSON.stringify(oData));
-        oOrder.products = _.merge(oClonedData, oOrder.products);
+        oOrder.products = _.values(_.merge(_.keyBy(oClonedData, '_id'), _.keyBy(oOrder.products, 'product')));
         oResponse.json({ data: oOrder });
     });
 }
