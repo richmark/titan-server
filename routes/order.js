@@ -12,10 +12,24 @@ const oRouter = oExpress.Router();
 
 const { requireSignin, checkAuth, checkAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
-const { createOrder, listOrders, orderById, getOrderById, updateOrderById, getOrderByUser, getOrderSettings, createOrderSettings, updateOrderSettings, settingById} = require("../controllers/order");
+const {
+    createOrder,
+    listOrders,
+    orderById,
+    getOrderById,
+    updateOrderById,
+    getOrderByUser,
+    getOrderSettings,
+    createOrderSettings,
+    updateOrderSettings,
+    settingById,
+    customerById,
+    getOrderProductsByUser
+} = require("../controllers/order");
 
 oRouter.get("/orders/:userId", requireSignin, checkAuth, listOrders);
 oRouter.get("/orders/lists/:userId", requireSignin, checkAuth, getOrderByUser);
+oRouter.get("/orders/products/:userId/:customerId", requireSignin, checkAuth, getOrderProductsByUser);
 oRouter.get("/orders/:userId/:orderId", requireSignin, checkAuth, getOrderById);
 oRouter.put("/orders/:userId/:orderId", requireSignin, checkAuth, checkAdmin, updateOrderById);
 oRouter.post("/order/create/:userId", requireSignin, checkAuth, createOrder);
@@ -31,5 +45,6 @@ oRouter.put("/settings/:userId/:settingId", requireSignin, checkAuth, updateOrde
 oRouter.param("userId", userById);
 oRouter.param("orderId", orderById);
 oRouter.param("settingId", settingById);
+oRouter.param("customerId", customerById);
 
 module.exports = oRouter;
