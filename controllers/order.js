@@ -39,7 +39,7 @@ exports.listOrders = (oRequest, oResponse) => {
         .find()
         .select('_id status createdAt updatedAt reference_number')
         .populate('user', '_id email')
-        .sort([[sSortBy, sOrder]])
+        .sort([['createdAt', 'desc']])
         // .limit(iLimit)
         // .skip(iOffset)
         .exec((oError, oData) => {
@@ -237,3 +237,34 @@ exports.settingById = (oRequest, oResponse, oNext, sId) => {
       oNext();
     });
 };
+
+/**
+ * Set Customer Id
+ */
+exports.customerById = (oRequest, oResponse, oNext, sId) => {
+    oRequest.customer_id = sId;
+    oNext();
+};
+
+/**
+ * Get orders with populated products by customer id
+ */
+exports.getOrderProductsByUser = (oRequest, oResponse) => {
+    oOrderModel
+    .find({
+        'user': oRequest.customer_id
+    })
+    .select('createdAt')
+    .populate("products.product", "product_name image")
+    .sort([['createdAt', 'desc']])
+    .exec((oError, oData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: "No Orders for User"
+            });
+        }
+        oResponse.json({
+            data: oData
+        });
+    })
+}
