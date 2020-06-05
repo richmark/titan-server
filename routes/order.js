@@ -24,12 +24,14 @@ const {
     updateOrderSettings,
     settingById,
     customerById,
-    getOrderProductsByUser
+    getOrderProductsByUser,
+    getProductsByCustomerOrder
 } = require("../controllers/order");
 
 oRouter.get("/orders/:userId", requireSignin, checkAuth, listOrders);
 oRouter.get("/orders/lists/:userId", requireSignin, checkAuth, getOrderByUser);
 oRouter.get("/orders/products/:userId/:customerId", requireSignin, checkAuth, getOrderProductsByUser);
+oRouter.get("/orders/products/:userId/:customerId/group", requireSignin, checkAuth, getProductsByCustomerOrder);
 oRouter.get("/orders/:userId/:orderId", requireSignin, checkAuth, getOrderById);
 oRouter.put("/orders/:userId/:orderId", requireSignin, checkAuth, checkAdmin, updateOrderById);
 oRouter.post("/order/create/:userId", requireSignin, checkAuth, createOrder);
