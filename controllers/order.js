@@ -12,6 +12,7 @@ const oProductModel = require("../models/product");
 const oSettingModel = require("../models/settings");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 const { _ } = require('lodash');
+const ObjectId = require('mongodb').ObjectID;
 
 /**
  * createOrder function
@@ -257,6 +258,47 @@ exports.getOrderProductsByUser = (oRequest, oResponse) => {
     .select('createdAt')
     .populate("products.product", "product_name image")
     .sort([['createdAt', 'desc']])
+    .exec((oError, oData) => {
+        if (oError) {
+            return oResponse.status(400).json({
+                error: "No Orders for User"
+            });
+        }
+        oResponse.json({
+            data: oData
+        });
+    })
+}
+
+/**
+ * Get ordered products with count field matching the given customer id
+ */
+exports.getProductsByCustomerOrder = (oRequest, oResponse) => {
+    oOrderModel
+    .aggregate([
+        {
+            $match: {
+                user: ObjectId(oRequest.customer_id) 
+            },
+        },
+        {
+            $unwind:"$products"
+        },
+        {
+            $group: {
+                _id: "$products.product",
+                count: { $sum: 1 }
+            },
+        },
+        { $lookup: {
+                from: "products",
+                localField: "_id",
+                foreignField: "_id",
+                as: "product",
+            }
+        },
+        { $project: { "product.product_name": 1, "product.image": 1, count: 1} }
+    ])
     .exec((oError, oData) => {
         if (oError) {
             return oResponse.status(400).json({
