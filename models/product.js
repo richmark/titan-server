@@ -68,6 +68,11 @@ const oProductSchema = new oMongoose.Schema(
     },
     bundle_product: {
       type: [oBundledProductsSchema]
+    },
+    weight: {
+      type: String,
+      enum: ['Small', 'Medium', 'Large'],
+      default: 'Small'
     }
   },
   { timestamps: true }
