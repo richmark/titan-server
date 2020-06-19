@@ -11,6 +11,32 @@ const oBundledProductsSchema = new oMongoose.Schema(
   { _id: false }
 );
 
+/**
+ * Delivery Price per Product
+ * Price is based on location
+ */
+const oDeliveryPriceSchema = new oMongoose.Schema(
+  {
+    metro_manila: {
+      type: Number,
+      required: true
+    },
+    luzon: {
+      type: Number,
+      required: true
+    },
+    visayas: {
+      type: Number,
+      required: true
+    },
+    mindanao: {
+      type: Number,
+      required: true
+    }
+  },
+  { _id: false }
+);
+
 const oProductSchema = new oMongoose.Schema(
   {
     product_name: {
@@ -69,10 +95,8 @@ const oProductSchema = new oMongoose.Schema(
     bundle_product: {
       type: [oBundledProductsSchema]
     },
-    weight: {
-      type: String,
-      enum: ['Small', 'Medium', 'Large'],
-      default: 'Small'
+    delivery_price: {
+      type: [oDeliveryPriceSchema]
     }
   },
   { timestamps: true }
