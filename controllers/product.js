@@ -46,6 +46,9 @@ exports.registerProduct = (oRequest, oResponse) => {
   if (typeof oRequest.body.bundle_product !== "undefined") {
     oRequest.body.bundle_product = JSON.parse(oRequest.body.bundle_product);
   }
+  if (typeof oRequest.body.delivery_price !== "undefined") {
+    oRequest.body.delivery_price = JSON.parse(oRequest.body.delivery_price);
+  }
   oRequest = this.setRequestBodyImage(oRequest);
   const oProduct = new oProductModel(oRequest.body);
   oProduct.save((oError, oData) => {
@@ -218,6 +221,9 @@ exports.listCategories = (oRequest, oResponse) => {
 exports.updateProduct = (oRequest, oResponse) => {
   if (typeof oRequest.body.additional_info !== "undefined") {
     oRequest.body.additional_info = JSON.parse(oRequest.body.additional_info);
+  }
+  if (typeof oRequest.body.delivery_price !== "undefined") {
+    oRequest.body.delivery_price = JSON.parse(oRequest.body.delivery_price);
   }
   oRequest = this.setRequestBodyImage(oRequest);
   oProductModel.findOneAndUpdate(

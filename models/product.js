@@ -96,7 +96,7 @@ const oProductSchema = new oMongoose.Schema(
       type: [oBundledProductsSchema]
     },
     delivery_price: {
-      type: [oDeliveryPriceSchema]
+      type: oDeliveryPriceSchema
     }
   },
   { timestamps: true }
