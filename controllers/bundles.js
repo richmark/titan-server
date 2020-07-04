@@ -77,6 +77,8 @@ exports.getBundleById = (oRequest, oResponse) => {
 exports.updateBundle = (oRequest, oResponse) => {
   oRequest = this.setRequestBodyImage(oRequest);
   oRequest.body.bundle_product = JSON.parse(oRequest.body.bundle_product);
+  oRequest.body.delivery_price = JSON.parse(oRequest.body.delivery_price);
+
   _.assignIn(oRequest.bundle, oRequest.body);
 
   oProductModel.findOneAndUpdate(
