@@ -32,6 +32,7 @@ const oBrainTreeRoutes = require("./routes/braintree");
 const oPaymayaRoutes = require("./routes/paymaya");
 const oBannerRoutes = require("./routes/banner");
 const oLevelRoutes = require("./routes/level");
+const oSideBannerRoutes = require("./routes/sidebanner");
 
 /**
  * App Instance
@@ -77,6 +78,7 @@ oApp.use("/api/v1", oCouponRoutes);
 oApp.use("/api/v1", oBundleRoutes);
 oApp.use("/api/v1", oBannerRoutes);
 oApp.use("/api/v1", oLevelRoutes);
+oApp.use("/api/v1", oSideBannerRoutes);
 
 /**
  * Default port 8000
