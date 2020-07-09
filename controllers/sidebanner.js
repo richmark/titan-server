@@ -100,7 +100,7 @@ exports.updateSideBanner = (oRequest, oResponse) => {
  */
 exports.deleteSideBanner = (oRequest, oResponse) => {
     oSideBannerModel.find({'_id': { $in: oRequest.body }})
-    .select('_id banner_image')
+    .select('_id side_banner_image')
     .exec((oError, oData) => {
         if (oError || oData.length < 1) {
             return oResponse.status(400).json({
