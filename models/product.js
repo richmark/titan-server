@@ -89,6 +89,15 @@ const oProductSchema = new oMongoose.Schema(
       enum: ["T", "F"],
       default: "F"
     },
+    display_sale: {
+      type: String,
+      enum: ["T", "F"],
+      default: "F"
+    },
+    discount_sale: {
+      type: Number,
+      default: 0
+    },
     brand: {
       type: String
     },
