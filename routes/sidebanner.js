@@ -41,6 +41,17 @@ oRouter.delete(
 );
 
 /**
+ * For Script Automation (ADD SIDEBANNERS)
+ */
+oRouter.post(
+    "/automate/sidebanner/create/:userId",
+    requireSignin,
+    checkAuth,
+    checkAdmin,
+    createSideBanner
+);
+
+/**
  * endpoint for public
  */
 oRouter.get('/sidebanners', listSideBannersByVisibility);
