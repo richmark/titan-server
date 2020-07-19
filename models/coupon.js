@@ -34,7 +34,7 @@ const oCouponSchema = new oMongoose.Schema(
       maxLength: 100
     },
     discount: {
-      type: Number,
+      type: String,
       required: true
     },
     start_date: {
