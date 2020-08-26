@@ -31,13 +31,14 @@ oRouter.post(
   createCoupon
 );
 
-oRouter.put(
-  "/coupon/:couponId/:userId",
-  requireSignin,
-  checkAuth,
-  checkAdmin,
-  updateCoupon
-);
+// Disabled update coupon 26/08/20 - Carlo Barcena
+// oRouter.put(
+//   "/coupon/:couponId/:userId",
+//   requireSignin,
+//   checkAuth,
+//   checkAdmin,
+//   updateCoupon
+// );
 
 oRouter.delete(
   "/coupon/:couponId/:userId",
