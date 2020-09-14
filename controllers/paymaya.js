@@ -156,7 +156,7 @@ this.insertOrderWebhook = (oReq, oRes, oResult, oData) => {
     aItems.map((oItem, iIndex) => {
         var oSingleProduct = {
             product: oItem.code,
-            price: parseInt(oItem.amount.value, 10),
+            price: parseFloat(oItem.amount.value, 10),
             count: parseInt(oItem.quantity, 10)
         };
         oOrder.products.push(oSingleProduct); 
@@ -346,7 +346,7 @@ this.insertOrder = (oReq, oRes, oResult) => {
     aItems.map((oItem, iIndex) => {
         var oSingleProduct = {
             product: oItem.code,
-            price: parseInt(oItem.amount.value, 10),
+            price: parseFloat(oItem.amount.value, 10),
             count: parseInt(oItem.quantity, 10)
         };
         oOrder.products.push(oSingleProduct); 

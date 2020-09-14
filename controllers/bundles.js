@@ -191,7 +191,7 @@ exports.listClientBundle = (oRequest, oResponse) => {
   
   oProductModel.aggregate([
     {
-      $match: { category: null }
+      $match: { category: null, display: 'T'  }
     },
     { 
       $lookup: oReviewLookup,

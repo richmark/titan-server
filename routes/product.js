@@ -60,7 +60,7 @@ oRouter.get("/products/categories", listCategories);
 oRouter.get("/products/category/:categoryId", listByCategory);
 
 /**
- * For Script Automation
+ * For Script Automation (ADD PRODUCTS)
  */
 oRouter.post(
   "/automate/product/create/:userId",

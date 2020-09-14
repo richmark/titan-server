@@ -17,7 +17,7 @@ const oOrderedProductSchema = new oMongoose.Schema(
             required: true
         },
         price: {
-            type: Number,
+            type: String,
             required: true
         },
         count: {
@@ -77,7 +77,7 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     amount: {
-        type: Number,
+        type: String,
         required: true
     },
     products: {
@@ -118,10 +118,10 @@ const oOrderSchema = new oMongoose.Schema(
         required: true
     },
     shipping_fee: {
-        type: Number
+        type: String
     },
     discount_fee: {
-        type: Number,
+        type: String,
         default: 0
     },
     reference_number: {

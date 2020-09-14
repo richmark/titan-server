@@ -18,19 +18,19 @@ const oBundledProductsSchema = new oMongoose.Schema(
 const oDeliveryPriceSchema = new oMongoose.Schema(
   {
     metro_manila: {
-      type: Number,
+      type: String,
       required: true
     },
     luzon: {
-      type: Number,
+      type: String,
       required: true
     },
     visayas: {
-      type: Number,
+      type: String,
       required: true
     },
     mindanao: {
-      type: Number,
+      type: String,
       required: true
     }
   },
@@ -46,7 +46,7 @@ const oProductSchema = new oMongoose.Schema(
       maxLength: 32
     },
     price: {
-      type: Number,
+      type: String,
       required: true
     },
     stock: {
@@ -88,6 +88,15 @@ const oProductSchema = new oMongoose.Schema(
       type: String,
       enum: ["T", "F"],
       default: "F"
+    },
+    display_sale: {
+      type: String,
+      enum: ["T", "F"],
+      default: "F"
+    },
+    discount_sale: {
+      type: Number,
+      default: 0
     },
     brand: {
       type: String
