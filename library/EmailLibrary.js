@@ -2,7 +2,7 @@ const oNodeMailer = require('nodemailer');
 
 exports.setEmailOptions = ({ email, subject, text, html }) => {
 	return {
-		from: 'Titan Supertools <test01.titan@gmail.com>',
+		from: `Titan Supertools <${process.env.EMAIL_USERNAME}>`,
 		to: email,
 		subject: subject,
 		text: text,
