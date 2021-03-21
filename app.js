@@ -13,6 +13,7 @@ const oBodyParser = require("body-parser");
 const oPath = require("path");
 const oCors = require("cors");
 const oExpressValidator = require("express-validator");
+const { getTransporter, setEmailOptionsBackUpDB } = require("./library/EmailLibrary");
 
 require("dotenv").config();
 
@@ -88,3 +89,84 @@ const iPort = process.env.PORT || 8000;
 oApp.listen(iPort, () => {
   console.log(`Server is running on port ${iPort}`);
 });
+
+const { spawn } = require('child_process');
+const path = require('path');
+
+const DB_NAME = 'titan-server';
+const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'public', `${DB_NAME}.gz`);
+
+const cron = require('node-cron');
+cron.schedule('0 12 * * *', () => this.backupServer()); // daily at 12 am
+
+this.backupServer = function () {
+	const child = spawn('C:\\Program Files\\MongoDB\\Server\\4.2\\bin\\mongodump', [
+	  `--db=${DB_NAME}`,
+	  `--archive=${ARCHIVE_PATH}`,
+	  `--gzip`
+	])
+  
+	child.stdout.on('data', (data) => {
+	  console.log('stdout:\n', data);
+	})
+	child.stderr.on('data', (data) => {
+	  console.log('stderr:\n', Buffer.from(data).toString());
+	})
+	child.on('error', (data) => {
+	  console.log('error:\n', data);
+	})
+	child.on('exit', (data, signal) => {
+	  if (data) {
+		console.log('Process exit with code:', data);
+	  }
+	  else if (signal) {
+		console.log('Process killed with signal:', signal);
+	  } else {
+		console.log('Backup is successful');
+		this.sendEmailWithAttachment();
+	  }
+	})
+};
+  
+this.restoreServer = function () {
+	const child = spawn('C:\\Program Files\\MongoDB\\Server\\4.2\\bin\\mongorestore', [
+	  `--db=${DB_NAME}`,
+	  `--archive=${ARCHIVE_PATH}`,
+	  `--gzip`
+	])
+  
+	child.stdout.on('data', (data) => {
+	  console.log('stdout:\n', data);
+	})
+	child.stderr.on('data', (data) => {
+	  console.log('stderr:\n', Buffer.from(data).toString());
+	})
+	child.on('error', (data) => {
+	  console.log('error:\n', data);
+	})
+	child.on('exit', (data, signal) => {
+	  if (data) {
+		console.log('Process exit with code:', data);
+	  }
+	  else if (signal) {
+		console.log('Process killed with signal:', signal);
+	  } else {
+		console.log('Restore is successful');
+	  }
+	})
+};
+  
+this.sendEmailWithAttachment = async () => {
+	oTransporter = getTransporter();
+	oMailOptions = setEmailOptionsBackUpDB(
+    'test01.titan@gmail.com', 'Titan Supertools DB Backup', 'Sucessful Backup please see zipped file', ARCHIVE_PATH, DB_NAME
+  );
+	const oMailData = await oTransporter.sendMail(oMailOptions);
+	if (!oMailData) {
+	  console.log(oMailData);
+	}
+	console.log("Backup file has been sent to test01.titan@gmail.com")
+};
+
+// this.backupServer();
+// this.restoreServer();

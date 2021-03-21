@@ -22,3 +22,18 @@ exports.getTransporter = () => {
 		}
 	});
 };
+
+exports.setEmailOptionsBackUpDB = (email, subject, text, path) => {
+	return {
+		from: 'Titan Supertools <test01.titan@gmail.com>',
+		to: email,
+		subject: subject,
+		text: text,
+		attachments: [
+			{
+				filename: 'titan-server.gz',
+				path: path
+			}
+		]
+	};
+}
