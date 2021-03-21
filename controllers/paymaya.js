@@ -18,7 +18,7 @@ require('dotenv').config();
 oPaymaya.initCheckout(
     process.env.PAYMAYA_PUBLIC_KEY,
     process.env.PAYMAYA_SECRET_KEY,
-    oPaymaya.ENVIRONMENT.SANDBOX
+    oPaymaya.ENVIRONMENT.PRODUCTION
 );
 
 /**
