@@ -25,7 +25,7 @@ exports.getTransporter = () => {
 
 exports.setEmailOptionsBackUpDB = (email, subject, text, path) => {
 	return {
-		from: 'Titan Supertools <test01.titan@gmail.com>',
+		from: `Titan Supertools <${process.env.EMAIL_USERNAME}>`,
 		to: email,
 		subject: subject,
 		text: text,
