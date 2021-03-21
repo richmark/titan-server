@@ -100,7 +100,7 @@ const cron = require('node-cron');
 cron.schedule('0 12 * * *', () => this.backupServer()); // daily at 12 am
 
 this.backupServer = function () {
-	const child = spawn('C:\\Program Files\\MongoDB\\Server\\4.2\\bin\\mongodump', [
+	const child = spawn('mongodump', [
 	  `--db=${DB_NAME}`,
 	  `--archive=${ARCHIVE_PATH}`,
 	  `--gzip`
@@ -129,7 +129,7 @@ this.backupServer = function () {
 };
   
 this.restoreServer = function () {
-	const child = spawn('C:\\Program Files\\MongoDB\\Server\\4.2\\bin\\mongorestore', [
+	const child = spawn('mongorestore', [
 	  `--db=${DB_NAME}`,
 	  `--archive=${ARCHIVE_PATH}`,
 	  `--gzip`
@@ -159,13 +159,13 @@ this.restoreServer = function () {
 this.sendEmailWithAttachment = async () => {
 	oTransporter = getTransporter();
 	oMailOptions = setEmailOptionsBackUpDB(
-    'test01.titan@gmail.com', 'Titan Supertools DB Backup', 'Sucessful Backup please see zipped file', ARCHIVE_PATH, DB_NAME
+    `${process.env.EMAIL_USERNAME}`, 'Titan Supertools DB Backup', 'Sucessful Backup please see zipped file', ARCHIVE_PATH, DB_NAME
   );
 	const oMailData = await oTransporter.sendMail(oMailOptions);
 	if (!oMailData) {
 	  console.log(oMailData);
 	}
-	console.log("Backup file has been sent to test01.titan@gmail.com")
+	console.log(`Backup file has been sent to ${process.env.EMAIL_USERNAME}`)
 };
 
 // this.backupServer();
