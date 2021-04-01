@@ -93,8 +93,8 @@ oApp.listen(iPort, () => {
 const { spawn } = require('child_process');
 const path = require('path');
 
-const DB_NAME = 'titan-server';
-const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'private', `${DB_NAME}.gz`);
+const DB_NAME = 'titan';
+const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'private', `${DB_NAME}`);
 
 console.log(ARCHIVE_PATH);
 
@@ -108,7 +108,7 @@ cron.schedule(CRON_SCHEDULE, () => this.backupServer()); // daily at 12 am
 this.backupServer = function () {
 	const child = spawn(MONGO_DUMP, [
 	  `--db=${DB_NAME}`,
-	  `--archive=${ARCHIVE_PATH}`,
+	  `--archive=${ARCHIVE_PATH}-db`,
 	  `--gzip`
 	])
   
@@ -137,7 +137,7 @@ this.backupServer = function () {
 this.restoreServer = function () {
 	const child = spawn(MONGO_RESTORE, [
 	  `--db=${DB_NAME}`,
-	  `--archive=${ARCHIVE_PATH}`,
+	  `--archive=${ARCHIVE_PATH}-db`,
 	  `--gzip`
 	])
   
