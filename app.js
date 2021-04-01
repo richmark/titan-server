@@ -96,6 +96,8 @@ const path = require('path');
 const DB_NAME = 'titan-server';
 const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'private', `${DB_NAME}.gz`);
 
+console.log(ARCHIVE_PATH);
+
 const MONGO_DUMP = process.env.MONGO_DUMP;
 const MONGO_RESTORE = process.env.MONGO_RESTORE;
 const CRON_SCHEDULE = process.env.CRON_SCHEDULE;
