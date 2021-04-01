@@ -31,7 +31,7 @@ exports.setEmailOptionsBackUpDB = (email, subject, text, path) => {
 		text: text,
 		attachments: [
 			{
-				filename: 'titan-server.gz',
+				filename: 'titan-db',
 				path: path
 			}
 		]
