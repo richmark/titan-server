@@ -94,13 +94,17 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 const DB_NAME = 'titan-server';
-const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'public', `${DB_NAME}.gz`);
+const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'private', `${DB_NAME}.gz`);
+
+const MONGO_DUMP = process.env.MONGO_DUMP;
+const MONGO_RESTORE = process.env.MONGO_RESTORE;
+const CRON_SCHEDULE = process.env.CRON_SCHEDULE;
 
 const cron = require('node-cron');
-cron.schedule('0 12 * * *', () => this.backupServer()); // daily at 12 am
+cron.schedule(CRON_SCHEDULE, () => this.backupServer()); // daily at 12 am
 
 this.backupServer = function () {
-	const child = spawn('mongodump', [
+	const child = spawn(MONGO_DUMP, [
 	  `--db=${DB_NAME}`,
 	  `--archive=${ARCHIVE_PATH}`,
 	  `--gzip`
@@ -129,7 +133,7 @@ this.backupServer = function () {
 };
   
 this.restoreServer = function () {
-	const child = spawn('mongorestore', [
+	const child = spawn(MONGO_RESTORE, [
 	  `--db=${DB_NAME}`,
 	  `--archive=${ARCHIVE_PATH}`,
 	  `--gzip`
