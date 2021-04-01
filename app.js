@@ -165,7 +165,7 @@ this.restoreServer = function () {
 this.sendEmailWithAttachment = async () => {
 	oTransporter = getTransporter();
 	oMailOptions = setEmailOptionsBackUpDB(
-    `${process.env.EMAIL_USERNAME}`, 'Titan Supertools DB Backup', 'Sucessful Backup please see zipped file', ARCHIVE_PATH, DB_NAME
+    `${process.env.EMAIL_USERNAME}`, 'Titan Supertools DB Backup', 'Sucessful Backup please see zipped file', `${ARCHIVE_PATH}-db`, DB_NAME
   );
 	const oMailData = await oTransporter.sendMail(oMailOptions);
 	if (!oMailData) {
