@@ -7,3 +7,4 @@ public/images/banners/banner-*
 public/images/sidebanners/sidebanner-*
 .env
 package-lock.json
+private/*

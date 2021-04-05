@@ -22,3 +22,18 @@ exports.getTransporter = () => {
 		}
 	});
 };
+
+exports.setEmailOptionsBackUpDB = (email, subject, text, path) => {
+	return {
+		from: `Titan Supertools <${process.env.EMAIL_USERNAME}>`,
+		to: email,
+		subject: subject,
+		text: text,
+		attachments: [
+			{
+				filename: 'titan-db',
+				path: path
+			}
+		]
+	};
+}
