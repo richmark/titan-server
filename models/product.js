@@ -43,7 +43,7 @@ const oProductSchema = new oMongoose.Schema(
       type: String,
       trim: true,
       required: true,
-      maxLength: 32
+      maxLength: 255
     },
     price: {
       type: String,

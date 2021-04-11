@@ -2,7 +2,7 @@ const oNodeMailer = require('nodemailer');
 
 exports.setEmailOptions = ({ email, subject, text, html }) => {
 	return {
-		from: 'Titan Supertools <test01.titan@gmail.com>',
+		from: `Titan Supertools <${process.env.EMAIL_USERNAME}>`,
 		to: email,
 		subject: subject,
 		text: text,
@@ -22,3 +22,18 @@ exports.getTransporter = () => {
 		}
 	});
 };
+
+exports.setEmailOptionsBackUpDB = (email, subject, text, path) => {
+	return {
+		from: `Titan Supertools <${process.env.EMAIL_USERNAME}>`,
+		to: email,
+		subject: subject,
+		text: text,
+		attachments: [
+			{
+				filename: 'titan-db',
+				path: path
+			}
+		]
+	};
+}
