@@ -96,7 +96,6 @@ const path = require('path');
 const DB_NAME = 'titan';
 const ARCHIVE_PATH = path.join(path.dirname(require.main.filename), 'private', `${DB_NAME}`);
 
-console.log(ARCHIVE_PATH);
 
 const MONGO_DUMP = process.env.MONGO_DUMP;
 const MONGO_RESTORE = process.env.MONGO_RESTORE;
@@ -173,6 +172,3 @@ this.sendEmailWithAttachment = async () => {
 	}
 	console.log(`Backup file has been sent to ${process.env.EMAIL_USERNAME}`)
 };
-
-// this.backupServer();
-// this.restoreServer();

@@ -13,12 +13,12 @@ require('dotenv').config();
 
 /**
  * Set to production if using production keys
- * Currently set to SANDBOX environment
+ * Currently set to PRODUCTION environment
  */
 oPaymaya.initCheckout(
     process.env.PAYMAYA_PUBLIC_KEY,
     process.env.PAYMAYA_SECRET_KEY,
-    oPaymaya.ENVIRONMENT.SANDBOX
+    oPaymaya.ENVIRONMENT.PRODUCTION
 );
 
 /**
