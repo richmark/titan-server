@@ -22,7 +22,7 @@ const oTokenEmailSchema = new oMongoose.Schema(
 		createdAt: {
 			type: Date,
 			default: Date.now,
-			expires: '10m'
+			expires: '60m'
 		}
 	},
 	{ timestamps: true }
